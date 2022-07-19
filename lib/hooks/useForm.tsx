@@ -1,9 +1,9 @@
 import { Field, FormContext, FormData } from "@context/form"
 import { unsnakeCase } from "@lib/text/replace";
 import upperFirst from "@lib/text/upperFirst"
-import React, { ChangeEvent, ChangeEventHandler, useEffect } from "react"
+import React, { ChangeEvent, useEffect } from "react"
 import { Button, ButtonProps, Form, FormField, Input, Message } from "semantic-ui-react"
-import { ApiData, ApiResponseHandler } from '../types/responses';
+import { ApiData, ApiResponseHandler } from '@lib/types/responses';
 
 export type FormSubmitHandler = (data: FormData) => Promise<ApiData<any>>
 export type FormResponseHandler<T> = (data: ApiData<T>) => void
@@ -71,7 +71,15 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
   )
 }
 
-export const useForm = () => {
+export interface UseForm {
+  data: FormData
+  setData(data: FormData): void
+  errors: FormData
+  setError(data: FormData): void
+  Form: React.FC<FormProps>
+}
+
+export const useForm = (): UseForm => {
   const { data, setData, errors, setError, clearData, clearErrors } = React.useContext(FormContext)
   useEffect(() => {
     clearData();
