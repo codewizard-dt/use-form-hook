@@ -1,0 +1,86 @@
+import { Field, FormContext, FormData } from "@context/form"
+import { unsnakeCase } from "@lib/text/replace";
+import upperFirst from "@lib/text/upperFirst"
+import React, { ChangeEvent, ChangeEventHandler, useEffect } from "react"
+import { Button, ButtonProps, Form, FormField, Input, Message } from "semantic-ui-react"
+import { ApiData, ApiResponseHandler } from '../types/responses';
+
+export type FormSubmitHandler = (data: FormData) => Promise<ApiData<any>>
+export type FormResponseHandler<T> = (data: ApiData<T>) => void
+export interface FormProps {
+  fields: Field[],
+  buttons?: ButtonProps[]
+  submit?: FormSubmitHandler
+  respond?: FormResponseHandler<any>
+  submitBtnText?: string
+}
+
+const defaultSubmit: FormSubmitHandler = async (data) => {
+  console.log('Submit data', data)
+  console.log('Define an onSubmit value for your form')
+  return data
+}
+const defaultRespond: FormResponseHandler<any> = (data) => {
+  console.log('Response data', data)
+}
+
+// const handleResponse: ApiResponseHandler<{data?:any,error?:string,errors:{[key:string]:string}}> =(response: ApiData)
+
+const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Submit", submit = defaultSubmit, respond = defaultRespond }) => {
+  const { data, setData, errors, setError } = React.useContext(FormContext)
+  useEffect(() => {
+    for (let field of fields) {
+      setData({ [field.name]: field.initial || '' })
+    }
+  }, [])
+
+  const formatLabelStr = (str: string): string => unsnakeCase(upperFirst(str))
+
+  const renderField =
+    ({ name, type = 'text', control = Input, label, useLabel = true, ...fieldProps }: Field, i: number) => (
+      <FormField key={i}
+        name={name}
+        label={label ? label : useLabel ? formatLabelStr(name) : undefined}
+        type={type}
+        error={errors[name]}
+        value={data[name] || ''}
+        control={control}
+        onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData({ [name]: ev.target.value }) }}
+        {...fieldProps} />
+    )
+
+  const onSubmit = () => {
+    submit(data)
+      .then(response => {
+        const { data, error, errors } = response
+        if (error) { setError({ form: error }) }
+        if (errors) setError(errors)
+        return response
+      })
+      .then(respond)
+      .catch(err => console.log(err))
+  }
+
+  return (
+    <Form onSubmit={onSubmit} error={errors.form !== undefined}>
+      {fields.map(renderField)}
+      {errors.form && <Message negative content={errors.form} />}
+      <Button color="blue" content={submitBtnText} />
+      {buttons.map((buttonProps, i) => <Button key={i} {...buttonProps} />)}
+    </Form>
+  )
+}
+
+export const useForm = () => {
+  const { data, setData, errors, setError, clearData, clearErrors } = React.useContext(FormContext)
+  useEffect(() => {
+    clearData();
+    clearErrors();
+  }, [])
+
+  return {
+    data, setData,
+    errors, setError,
+    Form: FormEl,
+  }
+}
