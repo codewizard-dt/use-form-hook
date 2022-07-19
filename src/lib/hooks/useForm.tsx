@@ -1,12 +1,15 @@
-import { Field, FormContext, FormData } from "@context/form"
-import { unsnakeCase } from "@lib/text/replace";
-import upperFirst from "@lib/text/upperFirst"
+// import { Field, FormContext, FormData } from "src/context/form"
+import { Field, FormContext, FormData } from '../../context/form'
+// import { unsnakeCase } from "src/lib/text/replace";
+// import upperFirst from "src/lib/text/upperFirst"
+import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect } from "react"
 import { Button, ButtonProps, Form, FormField, Input, Message } from "semantic-ui-react"
-import { ApiData, ApiResponseHandler } from '@lib/types/responses';
+// import { ApiResponse, ApiResponseHandler } from 'src/lib/types/responses';
+import { ApiResponse, ApiResponseHandler } from '../types'
 
-export type FormSubmitHandler = (data: FormData) => Promise<ApiData<any>>
-export type FormResponseHandler<T> = (data: ApiData<T>) => void
+export type FormSubmitHandler = (data: FormData) => Promise<ApiResponse<any>>
+export type FormResponseHandler<T> = (response: ApiResponse<T>) => void
 export interface FormProps {
   fields: Field[],
   buttons?: ButtonProps[]
@@ -24,7 +27,7 @@ const defaultRespond: FormResponseHandler<any> = (data) => {
   console.log('Response data', data)
 }
 
-// const handleResponse: ApiResponseHandler<{data?:any,error?:string,errors:{[key:string]:string}}> =(response: ApiData)
+// const handleResponse: ApiResponseHandler<{data?:any,error?:string,errors:{[key:string]:string}}> =(response: ApiResponse)
 
 const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Submit", submit = defaultSubmit, respond = defaultRespond }) => {
   const { data, setData, errors, setError } = React.useContext(FormContext)

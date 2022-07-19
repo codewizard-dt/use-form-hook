@@ -16,14 +16,6 @@
     "strict": true, 
     "skipLibCheck": true, 
     "baseUrl": ".",
-    "paths": {
-      "@lib/*": [
-        "lib/*"
-      ],
-      "@context/*": [
-        "context/*"
-      ]
-    }
   },
   "include": [
     "custom.d.ts",

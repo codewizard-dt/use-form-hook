@@ -1,10 +1,7 @@
 {
-  "name": "use-form-hook",
-  "version": "1.0.0",
+  "name": "@codewizard-dt/use-form-hook",
+  "version": "1.1.0",
   "description": "A hook that provides a dynamic form handling component for React & Semantic UI",
-  "directories": {
-    "lib": "lib"
-  },
   "dependencies": {
     "lodash": "^4.17.21",
     "react": "^18.2.0",
@@ -37,14 +34,14 @@
     "hook",
     "dynamic"
   ],
-  "main": "dist/cjs/index/js",
+  "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "author": "David Taylor",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/codewizard-dt/use-form-hook/issues"
   },
