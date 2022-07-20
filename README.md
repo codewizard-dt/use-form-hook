@@ -11,10 +11,10 @@ The hook returns an object that fits the `UseForm` interface. The only property 
 ```typescript
 export interface UseForm {
   Form: React.FC<FormProps>;
-  data: FormData;
-  setData(data: FormData): void;
-  errors: FormData;
-  setError(data: FormData): void;
+  data: ApiFormData;
+  setData(data: ApiFormData): void;
+  errors: ApiFormData;
+  setError(data: ApiFormData): void;
 }
 ```
 
@@ -94,7 +94,7 @@ interface ApiResponse<T> {
 }
 // the data object passed to the `submit` function is a map of all the `Fields`
 // data = {[fieldName]: fieldValue}
-type FormSubmitHandler = (data: FormData) => Promise<ApiResponse<any>>;
+type FormSubmitHandler = (data: ApiFormData) => Promise<ApiResponse<any>>;
 ```
 
 ```tsx

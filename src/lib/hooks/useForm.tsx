@@ -1,15 +1,9 @@
-// import { Field, FormContext, FormData } from "src/context/form"
-import { Field, FormContext, FormData } from '../../context/form'
-// import { unsnakeCase } from "src/lib/text/replace";
-// import upperFirst from "src/lib/text/upperFirst"
+import { Field, FormContext, ApiFormData } from '../../context/form'
 import { unsnakeCase, upperFirst } from '../text'
-import React, { ChangeEvent, useEffect } from "react"
+import React, { ChangeEvent, useEffect, useState } from "react"
 import { Button, ButtonProps, Form, FormField, Input, Message } from "semantic-ui-react"
-// import { ApiResponse, ApiResponseHandler } from 'src/lib/types/responses';
-import { ApiResponse, ApiResponseHandler } from '../types'
+import { ApiResponse, ApiResponseHandler, FormResponseHandler, FormSubmitHandler } from '../types'
 
-export type FormSubmitHandler = (data: FormData) => Promise<ApiResponse<any>>
-export type FormResponseHandler<T> = (response: ApiResponse<T>) => void
 export interface FormProps {
   fields: Field[],
   buttons?: ButtonProps[]
@@ -20,17 +14,14 @@ export interface FormProps {
 
 const defaultSubmit: FormSubmitHandler = async (data) => {
   console.log('Submit data', data)
-  console.log('Define an onSubmit value for your form')
   return data
 }
 const defaultRespond: FormResponseHandler<any> = (data) => {
   console.log('Response data', data)
 }
 
-// const handleResponse: ApiResponseHandler<{data?:any,error?:string,errors:{[key:string]:string}}> =(response: ApiResponse)
-
 const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Submit", submit = defaultSubmit, respond = defaultRespond }) => {
-  const { data, setData, errors, setError } = React.useContext(FormContext)
+  const { data, setData, errors, setError, isWaiting, setIsWaiting } = React.useContext(FormContext)
   useEffect(() => {
     for (let field of fields) {
       setData({ [field.name]: field.initial || '' })
@@ -53,6 +44,7 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
     )
 
   const onSubmit = () => {
+    setIsWaiting(true)
     submit(data)
       .then(response => {
         const { data, error, errors } = response
@@ -61,6 +53,7 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
         return response
       })
       .then(respond)
+      .then(() => setIsWaiting(false))
       .catch(err => console.log(err))
   }
 
@@ -68,30 +61,34 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
     <Form onSubmit={onSubmit} error={errors.form !== undefined}>
       {fields.map(renderField)}
       {errors.form && <Message negative content={errors.form} />}
-      <Button color="blue" content={submitBtnText} />
+      <Button disabled={isWaiting} color="blue" content={submitBtnText} />
       {buttons.map((buttonProps, i) => <Button key={i} {...buttonProps} />)}
     </Form>
   )
 }
 
 export interface UseForm {
-  data: FormData
-  setData(data: FormData): void
-  errors: FormData
-  setError(data: FormData): void
   Form: React.FC<FormProps>
+  data: ApiFormData
+  setData(data: ApiFormData): void
+  errors: ApiFormData
+  setError(data: ApiFormData): void
+  isWaiting: boolean
+  setIsWaiting(isWaiting: boolean): void
 }
 
 export const useForm = (): UseForm => {
-  const { data, setData, errors, setError, clearData, clearErrors } = React.useContext(FormContext)
+  const { data, setData, errors, setError, clearData, clearErrors, isWaiting, setIsWaiting } = React.useContext(FormContext)
+
   useEffect(() => {
     clearData();
     clearErrors();
   }, [])
 
   return {
+    Form: FormEl,
     data, setData,
     errors, setError,
-    Form: FormEl,
+    isWaiting, setIsWaiting
   }
 }
