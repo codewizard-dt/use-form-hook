@@ -1,4 +1,4 @@
-import { Field, FormContext, ApiFormData, FieldGroup } from '../../context/form'
+import { Field, FormContext, ApiFormData, FieldGroup, FormContextI } from '../../context/form'
 import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { Button, ButtonProps, Form, FormField, FormGroup, Input, Message } from "semantic-ui-react"
@@ -21,30 +21,38 @@ const defaultRespond: FormResponseHandler<any> = (data) => {
 }
 
 const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Submit", submit = defaultSubmit, respond = defaultRespond }) => {
-  const { data, setData, errors, setError, isWaiting, setIsWaiting } = React.useContext(FormContext)
+  const { data, getData, setData, errors, setError, isWaiting, setIsWaiting } = React.useContext(FormContext)
   useEffect(() => {
     for (let field of fields) {
-      setData({ [field.name]: field.initial || '' })
+      if (field.fields) {
+        for (let innerField of field.fields) {
+          setData(`${field.name}.${innerField.name}`, innerField.initial || '')
+        }
+      } else {
+        setData(field.name, field.initial || '')
+      }
     }
   }, [])
 
   const formatLabelStr = (str: string): string => unsnakeCase(upperFirst(str))
 
-  const renderField =
-    ({ name, type = 'text', control = Input, label, useLabel = true, ...fieldProps }: Field, i: number | string) => (
+  const renderField = ({ name, type = 'text', control = Input, label, useLabel = true, group, ...fieldProps }: Field, i: number | string) => {
+    const nestedName = group ? `${group}.${name}` : name
+    return (
       <FormField key={i}
-        name={name}
+        name={nestedName}
         label={label ? label : useLabel ? formatLabelStr(name) : undefined}
         type={type}
         error={errors[name]}
-        value={data[name] || ''}
+        value={getData(nestedName) || ''}
         control={control}
-        onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData({ [name]: ev.target.value }) }}
+        onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData(nestedName, ev.target.value) }}
         {...fieldProps} />
     )
-  const renderGroup = ({ fields = [], ...groupProps }: FieldGroup, i: number) => (
+  }
+  const renderGroup = ({ name, fields = [], ...groupProps }: FieldGroup, i: number) => (
     <FormGroup key={i} {...groupProps}>
-      {fields.map((field, j) => renderField(field, `${i}-${j}`))}
+      {fields.map((field, j) => renderField({ ...field, group: name }, `${i}-${j}`))}
     </FormGroup>
   )
 
@@ -53,8 +61,11 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
     submit(data)
       .then(response => {
         const { data, error, errors } = response
-        if (error) { setError({ form: error }) }
-        if (errors) setError(errors)
+        if (error) { setError('form', error) }
+        if (errors) {
+          for (let errName in errors) { setError(errName, errors[errName]) }
+          // setError(errors)
+        }
         return response
       })
       .then(respond)
@@ -73,28 +84,20 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
   )
 }
 
-export interface UseForm {
+export interface UseForm extends FormContextI {
   Form: React.FC<FormProps>
-  data: ApiFormData
-  setData(data: ApiFormData): void
-  errors: ApiFormData
-  setError(data: ApiFormData): void
-  isWaiting: boolean
-  setIsWaiting(isWaiting: boolean): void
 }
 
 export const useForm = (): UseForm => {
-  const { data, setData, errors, setError, clearData, clearErrors, isWaiting, setIsWaiting } = React.useContext(FormContext)
+  const context = React.useContext(FormContext)
 
   useEffect(() => {
-    clearData();
-    clearErrors();
+    context.clearData();
+    context.clearErrors();
   }, [])
 
   return {
     Form: FormEl,
-    data, setData,
-    errors, setError,
-    isWaiting, setIsWaiting
+    ...context
   }
 }

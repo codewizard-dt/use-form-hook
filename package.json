@@ -1,6 +1,6 @@
 {
   "name": "@codewizard-dt/use-form-hook",
-  "version": "1.1.6",
+  "version": "1.1.8",
   "description": "A hook that provides a dynamic form handling component for React & Semantic UI",
   "scripts": {
     "test": "jest",

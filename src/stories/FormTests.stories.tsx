@@ -25,12 +25,11 @@ export const Groups = Template.bind({});
 Groups.args = {
   fieldsOrGroups: [
     {
-      name: 'Group 1',
+      name: 'user',
       fields: [
-        { name: 'name' },
-        { name: 'password' }
+        { name: 'name', width: '10', initial: 'Sally' },
+        { name: 'password', width: '6' }
       ],
-      widths: "equal"
     },
   ]
 }
