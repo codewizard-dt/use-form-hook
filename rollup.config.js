@@ -25,6 +25,7 @@ export default [
       'react-dom',
       'lodash',
       'semantic-ui-react',
+      'path'
     ],
     plugins: [
       resolve(),

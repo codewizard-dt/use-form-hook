@@ -1,11 +1,11 @@
-import { Field, FormContext, ApiFormData } from '../../context/form'
+import { Field, FormContext, ApiFormData, FieldGroup } from '../../context/form'
 import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect, useState } from "react"
-import { Button, ButtonProps, Form, FormField, Input, Message } from "semantic-ui-react"
+import { Button, ButtonProps, Form, FormField, FormGroup, Input, Message } from "semantic-ui-react"
 import { ApiResponse, ApiResponseHandler, FormResponseHandler, FormSubmitHandler } from '../types'
 
 export interface FormProps {
-  fields: Field[],
+  fields: (Field & FieldGroup)[],
   buttons?: ButtonProps[]
   submit?: FormSubmitHandler
   respond?: FormResponseHandler<any>
@@ -31,7 +31,7 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
   const formatLabelStr = (str: string): string => unsnakeCase(upperFirst(str))
 
   const renderField =
-    ({ name, type = 'text', control = Input, label, useLabel = true, ...fieldProps }: Field, i: number) => (
+    ({ name, type = 'text', control = Input, label, useLabel = true, ...fieldProps }: Field, i: number | string) => (
       <FormField key={i}
         name={name}
         label={label ? label : useLabel ? formatLabelStr(name) : undefined}
@@ -42,6 +42,11 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
         onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData({ [name]: ev.target.value }) }}
         {...fieldProps} />
     )
+  const renderGroup = ({ fields = [], ...groupProps }: FieldGroup, i: number) => (
+    <FormGroup key={i} {...groupProps}>
+      {fields.map((field, j) => renderField(field, `${i}-${j}`))}
+    </FormGroup>
+  )
 
   const onSubmit = () => {
     setIsWaiting(true)
@@ -59,7 +64,8 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
 
   return (
     <Form onSubmit={onSubmit} error={errors.form !== undefined}>
-      {fields.map(renderField)}
+      {fields.map((fieldOrGroup, i) => fieldOrGroup.fields ? renderGroup(fieldOrGroup, i) : renderField(fieldOrGroup, i))}
+
       {errors.form && <Message negative content={errors.form} />}
       <Button disabled={isWaiting} color="blue" content={submitBtnText} />
       {buttons.map((buttonProps, i) => <Button key={i} {...buttonProps} />)}

@@ -1,10 +1,13 @@
 import React, { PropsWithChildren, Reducer, useReducer, useState } from "react"
-import { Form, FormFieldProps } from "semantic-ui-react"
+import { Form, FormFieldProps, FormGroupProps } from "semantic-ui-react"
 
 export interface Field extends FormFieldProps {
   name: string,
   useLabel?: boolean
   initial?: string,
+}
+export interface FieldGroup extends FormGroupProps {
+  fields?: Field[]
 }
 
 export interface Form {

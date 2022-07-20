@@ -1,4 +1,5 @@
 .rollup*
+.storybook
 # Logs
 logs
 *.log
