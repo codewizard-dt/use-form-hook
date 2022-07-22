@@ -4,7 +4,7 @@
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](https://opensource.org/licenses/MIT)
 
-## A `Form` component exposed by a hook
+## A Form component exposed by a hook
 
 Hooking up forms in React can be a real pain in the butt, but this package makes it EASY. It automatically handles form data in a way that prevents unnecessary component re-renders and helps you write the LEAST CODE possible. This package also relies on Semantic UI.
 
@@ -18,8 +18,10 @@ Hooking up forms in React can be a real pain in the butt, but this package makes
 - [Questions](#questions)
 
 # Installation
-
-- Run `npm i @codewizard-dt/use-form-hook
+```
+npm i @codewizard-dt/use-form-hook
+```
+- Run npm install
 - Install peer dependencies
   - `semantic-ui-css`
   - `semantic-ui-react`
@@ -29,15 +31,19 @@ Hooking up forms in React can be a real pain in the butt, but this package makes
 
 # Usage
 
+This is a reusable React form template, complete with buttons and submission/response handling. The logic is built in, so all you need to provide is the names and attributes of the form fields.
+
 ## Import Semantic UI Global Css
 
-With NextJs, add this line in `_app.(tsx|jsx)`, otherwise any top-level component.
+First off, you need to install the Semantic UI style sheet. After installing via npm, make sure you import the file into a top-level component. In NextJs, you need to add this line in `_app.(tsx|jsx)`.
 
 ```ts
 import "semantic-ui-css/semantic.min.css";
 ```
 
 ## Put `FormProvider` in your app layout
+
+The FormProvider gives a reusable context that stores the state of the form data, form errors, and the methods to update them. You MUST have the FormProvider in your DOM in order to use the hook. You can only have one active form at a time. If you need more, you'll have to provide multiple FormProviders.
 
 ```tsx
 import { FormProvider } from "@codewizard-dt/use-form-hook";
@@ -50,6 +56,10 @@ import { FormProvider } from "@codewizard-dt/use-form-hook";
 
 ## Call `useForm` hook to expose the `Form` component
 
+Any child component of FormProvider will have access to the form logic. Just use the hook by calling `useForm`.  It return an object, the most important part of which is the `Form` component. Render the Form component and provide an array of fields.
+
+There are defaults for the submit and respond properties. If you don't include them initially, the Form will console.log your data for you.
+
 ```tsx
 import { useForm } from "@codewizard-dt/use-form-hook";
 const ChildComponent = (props) => {
@@ -60,7 +70,17 @@ const ChildComponent = (props) => {
 
 ## Provide the `Form` element with `fields`, `submit`, and `respond` properties
 
+| Form property | Description | Required |
+| ----------- | ----------- | ----------- |
+| fields | Array(object) an array of objects with properties that will be mapped onto FormField components from Semantic UI | true |
+| submit | (function) called with the form data when the form is submitted | false |
+| respond | (function) called with the API response when the request is finished. Can contain data or errors | false |
+| buttons | Array(object) an array of objects with properties that will be mapped onto Button components from Semantic UI. Accepts all properties of the Button component | false |
+| submitBtnText | (string) custom text for the submit button | false |
+
 ### Provide `fields` property as an array of objects
+
+The smallest object that can render an input field is just a name. The Form component will construct all of the components and connect them for you. 
 
 ```tsx
 // Example.. Notice all you need is a `name`
@@ -75,8 +95,11 @@ fields={[
 ]}
 ```
 ![Example](./screenshots/example1.png)
-## Fields
-| Property | Description | Required |
+# Creating Fields
+The `fields` property is an array. It can include any number of `Field`s and/or `FieldGroup`s, in any order.  The form data object will reflect any nested structures that you create.
+## Field Properties
+A field object can use any property that a `FormField` component from Semantic UI can use.
+| Field Property | Description | Required |
 | ----------- | ----------- | ----------- |
 | name | (string) used as a string key for form data | true |
 | initial | (string) initial field value | false |
@@ -88,7 +111,12 @@ fields={[
 | options | Array(string\|object) rendered as `<option>` for `<select>` tags | false |
 | disabled | (boolean) | false |
 | width | (SemanticWIDTHS) width as determined by Semantic UI | false |
-| fields | (Field) creates nested form groups | false |
+## Field Group Properties
+A field group object can use any property that a `FormGroup` component from Semantic UI can use.
+| Property | Description | Required |
+| ----------- | ----------- | ----------- |
+| name | (string) used as a string key for form data. If you use an empty string, the form data object will not be nested. | true |
+| *fields* | Array(Field) creates nested form groups  | false |
 | widths | (SemanticWIDTHS) determines width for nested form fields | false |
 
 ## The Form Data Object
@@ -218,3 +246,7 @@ None yet!
 # Questions
 
 If you have any questions, please contact me on [Github](https://github.com/codewizard-dt) or [email](mailto:david@codewizard.app).
+
+## [Gimme Readme](https://github.com/codewizard-dt/gimme-readme)
+
+This file was initialized by the Gimme Readme command line README generator
