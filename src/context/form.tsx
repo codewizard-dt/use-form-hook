@@ -80,10 +80,6 @@ export const FormProvider: React.FC<PropsWithChildren> = ({ children }) => {
       errors, getError, setError,
       clearData, clearErrors,
       isWaiting, setIsWaiting
-      // data, errors,
-      // setData, setError,
-      // clearData, clearErrors,
-      // isWaiting, setIsWaiting
     }}>
       {children}
     </FormContext.Provider>

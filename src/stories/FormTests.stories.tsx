@@ -30,12 +30,16 @@ export const Fields = () => {
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
         <Form submit={submit} fields={[
-          { name: 'name', width: '4' },
-          { name: 'password', type: 'password' },
-          { name: 'phone_number', type: 'number' },
-          { name: 'favorite_food', control: 'select', options: ['apples', 'bananas', { value: 'string cheese', label: 'StRiNg CheeSe' }] },
-          { name: 'favorite_color' }
-        ]} />
+          {
+            name: "",
+            widths: 'two',
+            fields: [
+              { name: 'best_restaurant' },
+              { name: 'worst_restaurant' }
+            ]
+          }
+        ]}
+        />
         {message !== '' && <Message>
           <pre>{message}</pre>
         </Message>}
@@ -54,7 +58,7 @@ export const GroupWithName = () => {
     <FormProvider>
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
-        <Header content='Field Group (with group name)' />
+        <Header content='Nested Field Groups with Names' />
         <Form submit={submit} fields={[
           {
             name: 'user', label: 'User',
@@ -79,7 +83,7 @@ export const GroupWithName = () => {
     </FormProvider>
   )
 }
-export const GroupWithoutName = () => {
+export const GroupsWithoutNames = () => {
   const { Form } = useForm()
   const [message, setMessage] = useState('')
   const submit: FormSubmitHandler = async (data) => {
@@ -90,24 +94,29 @@ export const GroupWithoutName = () => {
     <FormProvider>
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
-        <Header content='Field Group (without group name)' />
-        <Form submit={submit} fields={[
-          {
-            name: '', label: 'User',
-            fields: [
-              { name: 'name', initial: 'Sally' },
-              { name: 'password', type: 'password' },
-              { name: 'favorite_food', control: 'select', options: ['apples', 'bananas', { value: 'string cheese', label: 'StRiNg CheeSe' }] },
-            ],
-          },
-          {
-            name: 'settings', label: 'Settings',
-            fields: [
-              { name: 'contact_pref', control: 'select', options: ['phone', 'email', 'smoke signal'] },
-              { name: 'email', control: 'select', options: ['none', 'marketing', 'all'] },
-            ],
-          },
-        ]} />
+        <Header content='Nested Field Groups without `names`' />
+        <Form submit={submit} fields={
+          [
+            {
+              name: '',
+              label: 'User',
+              fields: [
+                { name: 'name', initial: 'Sally' },
+                { name: 'password', type: 'password' },
+                { name: 'favorite_food', control: 'select', options: ['apples', 'bananas', { value: 'string cheese', label: 'StRiNg CheeSe' }] },
+                {
+                  name: '',
+                  label: 'Settings',
+                  fields: [
+                    { name: 'contact_pref', control: 'select', options: ['phone', 'email', 'smoke signal'] },
+                    { name: 'email', control: 'select', options: ['none', 'marketing', 'all'] },
+                  ],
+                },
+
+              ],
+            },
+          ]
+        } />
         {message !== '' && <Message>
           <pre>{message}</pre>
         </Message>}

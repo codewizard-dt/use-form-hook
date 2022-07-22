@@ -1,6 +1,6 @@
 {
   "name": "@codewizard-dt/use-form-hook",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "description": "A hook that provides a dynamic form handling component for React & Semantic UI",
   "scripts": {
     "test": "jest",
@@ -33,10 +33,14 @@
     "@types/jest": "^28.1.6",
     "@types/lodash": "^4.14.182",
     "@types/react": "^18.0.15",
+    "autoprefixer": "^10.4.7",
     "babel-loader": "^8.2.5",
     "path": "^0.12.7",
+    "postcss": "^8.4.14",
+    "postcss-import": "^14.1.0",
     "rollup": "^2.77.0",
     "rollup-plugin-dts": "^4.2.2",
+    "rollup-plugin-postcss": "^4.0.2",
     "semantic-ui-css": "^2.4.1",
     "tslib": "^2.4.0",
     "typescript": "^4.7.4"

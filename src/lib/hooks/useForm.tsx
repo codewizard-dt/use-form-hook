@@ -1,17 +1,17 @@
-import { Field, FormContext, ApiFormData, FieldGroup, FormContextI, FieldOption } from '../../context/form'
+import { Field, FormContext, FieldGroup, FormContextI, FieldOption } from '../../context/form'
 import { unsnakeCase, upperFirst } from '../text'
-import React, { ChangeEvent, useEffect, useState } from "react"
-import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Label, Header } from "semantic-ui-react"
-import { ApiResponse, ApiResponseHandler, FormResponseHandler, FormSubmitHandler } from '../types'
-import '../../style/form.css'
-import { getFirstOption } from '../fields'
+import React, { ChangeEvent, useEffect } from "react"
+import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Header } from "semantic-ui-react"
+import { ApiResponseHandler, FormSubmitHandler } from '../types'
 import { getFlatFields } from '../fields/getFlatFields'
+
+import '../../style/form.css'
 
 export interface FormProps extends FormPropsUI {
   fields: (Field & FieldGroup)[],
   buttons?: ButtonProps[]
   submit?: FormSubmitHandler
-  respond?: FormResponseHandler<any>
+  respond?: ApiResponseHandler<any>
   submitBtnText?: string
 }
 
@@ -19,7 +19,7 @@ const defaultSubmit: FormSubmitHandler = async (data) => {
   console.log('Submit data', data)
   return data
 }
-const defaultRespond: FormResponseHandler<any> = (data) => {
+const defaultRespond: ApiResponseHandler<any> = (data) => {
   console.log('Response data', data)
 }
 

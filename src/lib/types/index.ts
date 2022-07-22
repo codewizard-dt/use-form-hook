@@ -1,8 +1,23 @@
 import { ApiFormData } from "../../context/form"
 
-export type ErrorResponse = { error: any }
-export type ApiResponse<T> = { data?: T, error?: any, errors?: { [key: string]: string } }
-export type ApiResponseHandler<T> = (apiResponse: ApiResponse<T>) => Promise<ApiResponse<T>>
+/**
+ * The structure of the API response expected
+ */
+export type ApiResponse<T> = {
+  data?: T,
+  error?: any,
+  errors?: {
+    [key: string]: string
+  }
+}
 
+
+/**
+ * Defines the `submit` property which sends the form data to the Api 
+ * Must return a promise
+ */
 export type FormSubmitHandler = (data: ApiFormData) => Promise<ApiResponse<any>>
-export type FormResponseHandler<T> = (response: ApiResponse<T>) => void
+/**
+ * Defines the `respond` property which receives the ApiResponse
+ */
+export type ApiResponseHandler<T> = (response: ApiResponse<T>) => void

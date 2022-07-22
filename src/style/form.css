@@ -2,7 +2,12 @@
   margin-top: 1rem;
 }
 
+.ui.form .fields {
+  flex-wrap: wrap;
+}
+
 .ui.form.use-form .fields > .form-group {
+  flex-basis: 100%;
   margin-top: 1.5em;
   padding-left: 0.5em;
   padding-right: 0.5em;

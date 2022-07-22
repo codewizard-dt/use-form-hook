@@ -119,7 +119,7 @@ const defaultSubmit: FormSubmitHandler = async (data) => {
 
 ## Respond property
 
-The respond property must be of the type `FormResponseHandler` which is defined by this package. This is a function that receives the response object and does something with it.
+The respond property must be of the type `ApiResponseHandler` which is defined by this package. This is a function that receives the response object and does something with it.
 
 ```typescript
 interface ApiResponse<T> {
@@ -127,12 +127,12 @@ interface ApiResponse<T> {
   error?: string;
   errors?: { [key: string]: string };
 }
-type FormResponseHandler<T> = (response: ApiResponse<T>) => void;
+type ApiResponseHandler<T> = (response: ApiResponse<T>) => void;
 ```
 
 ```tsx
 // If you don't include a `respond` property, you will see the response in the console
-const defaultRespond: FormResponseHandler<any> = (data) => {
+const defaultRespond: ApiResponseHandler<any> = (data) => {
   console.log("Response data", data);
 };
 ```
