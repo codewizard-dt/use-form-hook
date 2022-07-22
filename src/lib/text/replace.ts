@@ -1,3 +1,3 @@
 export function unsnakeCase(str: string): string {
-  return str.replace('_', ' ')
+  return str.replace(/_/g, ' ')
 }

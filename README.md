@@ -1,151 +1,66 @@
 <!-- @format -->
 
-# EASY Forms in React (with Semantic UI)
+# Dynamic React Forms
 
-This package provides a component that automatically handles form data, submission, and error handling. The component is createdy by and returned by a hook. That component relies on a React Context.Provider for state management.
+[![License: MIT](https://img.shields.io/badge/license-MIT-yellow)](https://opensource.org/licenses/MIT)
 
-## The Hook Response
+## A `Form` component exposed by a hook
 
-The hook returns an object that fits the `UseForm` interface. The only property that you **NEED** to use is the `Form` property, which is a functional arrow component
+Hooking up forms in React can be a real pain in the butt, but this package makes it EASY. It automatically handles form data in a way that prevents unnecessary component re-renders and helps you write the LEAST CODE possible. This package also relies on Semantic UI.
 
-```typescript
-export interface UseForm {
-  Form: React.FC<FormProps>;
-  data: ApiFormData;
-  setData(data: ApiFormData): void;
-  errors: ApiFormData;
-  setError(data: ApiFormData): void;
-}
-```
+# Table of Contents
 
-## Calling the Hook
+- [Installation](#installation)
+- [Usage](#usage)
+- [License](#license)
+- [Contributing](#contributing)
+- [Tests](#tests)
+- [Questions](#questions)
 
-```typescript
-import { useForm } from "@codewizard-dt/use-form-hook";
+# Installation
 
-const YourComponent = (props) => {
-  const { Form } = useForm();
-  ...
-};
-```
+- Run `npm i @codewizard-dt/use-form-hook
+- Install peer dependencies
+  - `semantic-ui-css`
+  - `semantic-ui-react`
+  - `lodash`
+  - `path`
+  - `react` of course
 
-# Using The Form Component
+# Usage
 
-The `Form` component is returned as a property from the `useForm` hooke. It must be a child of the `FormProvider`. You can put the `Form` component anywhere in the DOM as long as it is a child of the `FormProvider` component.
+## Import Semantic UI Global Css
 
-## Parent Component
+## Put `FormProvider` in your app layout
 
-```tsx
-import { FormProvider } from "@codewizard-dt/use-form-hook";
-const LayoutComponent = ({ children }) => {
-  return (
-    <FormProvider>
-      /** Any child of `FormProvider` can use the hook */
-      {children}
-    </FormProvider>
-  );
-};
-```
+## Call `useForm` hook to expose the `Form` component
 
-## Child Component
+## Provide the `Form` element with `fields`, `submit`, and `respond` properties
 
-```tsx
-import { useForm } from "@codewizard-dt/use-form-hook";
-const ChildComponent = (props) => {
-  const { Form } = useForm();
-  return <Form />;
-};
-```
+### Provide `fields` property as an array of objects
 
-# Form Component and FormProps
+### Provide `submit` property as a function
 
-The only required property is `fields`, in which you define the input fields of the form. The `fields` property is an array of objects that implement the `Field` interface. The `submit` property is the action of the form (ie POST data). The `respond` property is the callback that handles the response. The `buttons` property is an array of [ButtonProps](https://react.semantic-ui.com/elements/button/) that will render additional buttons. A submit button is rendered by default. The `submitBtnText` property overrides the default 'submit' text in the button.
+### Provide `respond` property as a function
 
-```tsx
-<Form fields={} submit={} respond={} buttons={} submitBtnText={}></Form>
-```
+## The Form Data Object
 
-## Fields property
+## API Responses
 
-Each field can receive any of the [FormFieldProps](https://react.semantic-ui.com/collections/form/) in addition to the properties from the `Field` interface.
+# License
 
-```tsx
-<Form
-  fields={[
-    { name: "username" }, // this is the minimum you need for each field
-    { name: "password", type: "password" },
-  ]}
-  submit={}
-  respond={}
-  buttons={}
-  submitBtnText={}
-></Form>
-```
+This project is provisioned under the [MIT License](https://opensource.org/licenses/MIT)
 
-## Submit property
+# Contributing
 
-The submit property must be of the type `FormSubmitHandler` which is defined by this package. This is a function that receives the form data and return a promise.
+[Repo link](https://github.com/codewizard-dt/use-form-hook)
 
-```typescript
-interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-  errors?: { [key: string]: string };
-}
-// the data object passed to the `submit` function is a map of all the `Fields`
-// data = {[fieldName]: fieldValue}
-type FormSubmitHandler = (data: ApiFormData) => Promise<ApiResponse<any>>;
-```
+Do you want to help make this project better? Visit the the repo to check out existing issues or create a new branch to start working on a suggested feature
 
-```tsx
-// If you don't include the `submit` property, you will see your data in the console
-const defaultSubmit: FormSubmitHandler = async (data) => {
-  console.log("Submit data", data);
-  console.log("Define an onSubmit value for your form");
-  return data;
-};
+# Tests
 
-// The `submit` function must ultimately return a promise
-<Form
-  fields={}
-  submit={(data) => {
-    return post(data);
-  }}
-  respond={}
-  buttons={}
-  submitBtnText={}
-></Form>;
-```
+None yet!
 
-## Respond property
+# Questions
 
-The respond property must be of the type `FormResponseHandler` which is defined by this package. This is a function that receives the response object and does something with it.
-
-```typescript
-interface ApiResponse<T> {
-  data?: T;
-  error?: string;
-  errors?: { [key: string]: string };
-}
-type FormResponseHandler<T> = (response: ApiResponse<T>) => void;
-```
-
-```tsx
-// If you don't include a `respond` property, you will see the response in the console
-const defaultRespond: FormResponseHandler<any> = (data) => {
-  console.log("Response data", data);
-};
-```
-
-```tsx
-<Form
-  fields={}
-  submit={}
-  respond={(response) => {
-    const { data, error, errors } = response;
-    // Do some action on the page based on the data
-  }}
-  buttons={}
-  submitBtnText={}
-></Form>
-```
+If you have any questions, please contact me on [Github](https://github.com/codewizard-dt) or [email](mailto:david@codewizard.app).

@@ -1,12 +1,14 @@
 import React, { PropsWithChildren, Reducer, useReducer, useState } from "react"
 import { Form, FormFieldProps, FormGroupProps } from "semantic-ui-react"
-import { NestedData, getDot, setDot } from "../lib/dot-notation"
+import { KeyedData, getDot, setDot } from "../lib/dot-notation"
 
+export type FieldOption = string | { value: string, label: string }
 export interface Field extends FormFieldProps {
   name: string,
-  group?: string,
+  dataKey?: string,
   useLabel?: boolean
   initial?: string,
+  options?: FieldOption[]
 }
 export interface FieldGroup extends FormGroupProps {
   fields?: Field[]
@@ -14,10 +16,10 @@ export interface FieldGroup extends FormGroupProps {
 
 export interface FormContextI {
   data: ApiFormData
-  getData: (key: string) => NestedData | string | undefined
+  getData: (key: string) => KeyedData | string | undefined
   setData: (key: string, value: string) => void
   errors: ApiFormData
-  getError: (key: string) => NestedData | string | undefined
+  getError: (key: string) => KeyedData | string | undefined
   setError: (key: string, value: string) => void
   clearData: () => void
   clearErrors: () => void
@@ -57,12 +59,12 @@ export const FormProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [data, dispatchData] = useReducer(reducer, {})
   const [errors, dispatchErrors] = useReducer(reducer, {})
 
-  const getData = (key: string): NestedData | string | undefined => getDot(key, data)
+  const getData = (key: string): KeyedData | string | undefined => getDot(key, data)
   const setData = (nestedKey: string, value: string) => {
     dispatchData({ type: 'ADD', payload: [nestedKey, value] })
   }
 
-  const getError = (key: string): NestedData | string | undefined => getDot(key, errors)
+  const getError = (key: string): KeyedData | string | undefined => getDot(key, errors)
   const setError = (nestedKey: string, value: string) => {
     dispatchErrors({ type: 'ADD', payload: [nestedKey, value] })
   }

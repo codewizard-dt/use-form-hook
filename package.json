@@ -1,6 +1,6 @@
 {
   "name": "@codewizard-dt/use-form-hook",
-  "version": "1.1.8",
+  "version": "1.1.13",
   "description": "A hook that provides a dynamic form handling component for React & Semantic UI",
   "scripts": {
     "test": "jest",
@@ -30,6 +30,7 @@
     "@storybook/manager-webpack4": "^6.5.9",
     "@storybook/react": "^6.5.9",
     "@storybook/testing-library": "0.0.13",
+    "@types/jest": "^28.1.6",
     "@types/lodash": "^4.14.182",
     "@types/react": "^18.0.15",
     "babel-loader": "^8.2.5",

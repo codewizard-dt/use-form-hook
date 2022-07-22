@@ -1,0 +1,13 @@
+.ui.form.use-form .ui.button {
+  margin-top: 1rem;
+}
+
+.ui.form.use-form .fields > .form-group {
+  margin-top: 1.5em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.ui.form.use-form .form-group + .form-group {
+  margin-top: 1.5em;
+}

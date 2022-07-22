@@ -1,10 +1,13 @@
-import { Field, FormContext, ApiFormData, FieldGroup, FormContextI } from '../../context/form'
+import { Field, FormContext, ApiFormData, FieldGroup, FormContextI, FieldOption } from '../../context/form'
 import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect, useState } from "react"
-import { Button, ButtonProps, Form, FormField, FormGroup, Input, Message } from "semantic-ui-react"
+import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Label, Header } from "semantic-ui-react"
 import { ApiResponse, ApiResponseHandler, FormResponseHandler, FormSubmitHandler } from '../types'
+import '../../style/form.css'
+import { getFirstOption } from '../fields'
+import { getFlatFields } from '../fields/getFlatFields'
 
-export interface FormProps {
+export interface FormProps extends FormPropsUI {
   fields: (Field & FieldGroup)[],
   buttons?: ButtonProps[]
   submit?: FormSubmitHandler
@@ -20,40 +23,58 @@ const defaultRespond: FormResponseHandler<any> = (data) => {
   console.log('Response data', data)
 }
 
-const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Submit", submit = defaultSubmit, respond = defaultRespond }) => {
+const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Submit", submit = defaultSubmit, respond = defaultRespond, ...formProps }) => {
   const { data, getData, setData, errors, setError, isWaiting, setIsWaiting } = React.useContext(FormContext)
   useEffect(() => {
-    for (let field of fields) {
-      if (field.fields) {
-        for (let innerField of field.fields) {
-          setData(`${field.name}.${innerField.name}`, innerField.initial || '')
-        }
-      } else {
-        setData(field.name, field.initial || '')
-      }
+    for (let [name, value] of Object.entries(getFlatFields(fields))) {
+      setData(name, value)
     }
   }, [])
 
   const formatLabelStr = (str: string): string => unsnakeCase(upperFirst(str))
 
-  const renderField = ({ name, type = 'text', control = Input, label, useLabel = true, group, ...fieldProps }: Field, i: number | string) => {
-    const nestedName = group ? `${group}.${name}` : name
+  const mapOption = (option: FieldOption, i: number) => {
+    let value: string, label: string
+    if (typeof option === 'string') value = label = option
+    else {
+      value = option.value
+      label = option.label
+    }
+    return <option key={i} value={value}>{label}</option>
+  }
+  const renderOptions = (options: FieldOption[]) => {
+    return (
+      <>
+        {options.map(mapOption)}
+      </>
+    )
+  }
+  const renderField = ({ name, dataKey, type = 'text', control = Input, options, label, useLabel = true, group, ...fieldProps }: Field, i: number | string) => {
     return (
       <FormField key={i}
-        name={nestedName}
+        name={name}
         label={label ? label : useLabel ? formatLabelStr(name) : undefined}
         type={type}
+        children={options ? renderOptions(options) : undefined}
         error={errors[name]}
-        value={getData(nestedName) || ''}
+        value={getData(dataKey || name) || ''}
         control={control}
-        onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData(nestedName, ev.target.value) }}
+        onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData(dataKey || name, ev.target.value) }}
         {...fieldProps} />
     )
   }
-  const renderGroup = ({ name, fields = [], ...groupProps }: FieldGroup, i: number) => (
-    <FormGroup key={i} {...groupProps}>
-      {fields.map((field, j) => renderField({ ...field, group: name }, `${i}-${j}`))}
-    </FormGroup>
+  const getDataKey = (group: string, field: string) => {
+    return group === '' ? field : group + '.' + field
+  }
+  const renderGroup = ({ name, dataKey, label, fields = [], ...groupProps }: FieldGroup, i: number | string) => (
+    <div key={i} className='form-group'>
+      {label && <Header as="h4" content={label} />}
+      <FormGroup  {...groupProps}>
+        {fields.map((field, j) => field.fields
+          ? renderGroup({ ...field, dataKey: getDataKey(dataKey || name, field.name) }, `${i}-${j}`)
+          : renderField({ ...field, dataKey: getDataKey(dataKey || name, field.name) }, `${i}-${j}`))}
+      </FormGroup>
+    </div>
   )
 
   const onSubmit = () => {
@@ -74,8 +95,8 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
   }
 
   return (
-    <Form onSubmit={onSubmit} error={errors.form !== undefined}>
-      {fields.map((fieldOrGroup, i) => fieldOrGroup.fields ? renderGroup(fieldOrGroup, i) : renderField(fieldOrGroup, i))}
+    <Form className='use-form' unstackable onSubmit={onSubmit} error={errors.form !== undefined} {...formProps}>
+      {fields.map((field, i) => field.fields ? renderGroup(field, i) : renderField(field, i))}
 
       {errors.form && <Message negative content={errors.form} />}
       <Button disabled={isWaiting} color="blue" content={submitBtnText} />
