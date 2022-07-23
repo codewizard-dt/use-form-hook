@@ -29,7 +29,7 @@ export const Fields = () => {
     <FormProvider>
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
-        <Form submit={submit} fields={[
+        <Form disabled submit={submit} fields={[
           {
             name: "",
             widths: 'two',
@@ -59,11 +59,11 @@ export const GroupWithName = () => {
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
         <Header content='Nested Field Groups with Names' />
-        <Form submit={submit} fields={[
+        <Form disabled submit={submit} fields={[
           {
             name: 'user', label: 'User',
             fields: [
-              { name: 'name', initial: 'Sally' },
+              { name: 'name', initial: 'David' },
               { name: 'password', type: 'password' },
               { name: 'favorite_food', control: 'select', options: ['apples', 'bananas', { value: 'string cheese', label: 'StRiNg CheeSe' }] },
               {

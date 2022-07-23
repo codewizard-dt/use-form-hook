@@ -1,6 +1,6 @@
 import { Field, FormContext, FieldGroup, FormContextI, FieldOption } from '../../context/form'
 import { unsnakeCase, upperFirst } from '../text'
-import React, { ChangeEvent, useEffect } from "react"
+import React, { ChangeEvent, useEffect, useState } from "react"
 import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Header } from "semantic-ui-react"
 import { ApiResponseHandler, FormSubmitHandler } from '../types'
 import { getFlatFields } from '../fields/getFlatFields'
@@ -13,6 +13,8 @@ export interface FormProps extends FormPropsUI {
   submit?: FormSubmitHandler
   respond?: ApiResponseHandler<any>
   submitBtnText?: string
+  disabled?: boolean
+  isEditable?: boolean
 }
 
 const defaultSubmit: FormSubmitHandler = async (data) => {
@@ -23,8 +25,20 @@ const defaultRespond: ApiResponseHandler<any> = (data) => {
   console.log('Response data', data)
 }
 
-const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Submit", submit = defaultSubmit, respond = defaultRespond, ...formProps }) => {
+const FormEl: React.FC<FormProps> = ({
+  fields,
+  buttons = [],
+  submitBtnText = "Submit",
+  submit = defaultSubmit,
+  respond = defaultRespond,
+  disabled = false,
+  isEditable = true,
+  ...formProps }) => {
+
   const { data, getData, setData, errors, setError, isWaiting, setIsWaiting } = React.useContext(FormContext)
+
+  const [isDisabled, setIsDisabled] = useState<boolean>(disabled)
+
   useEffect(() => {
     for (let [name, value] of Object.entries(getFlatFields(fields))) {
       setData(name, value)
@@ -55,6 +69,7 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
         name={name}
         label={label ? label : useLabel ? formatLabelStr(name) : undefined}
         type={type}
+        disabled={isDisabled}
         children={options ? renderOptions(options) : undefined}
         error={errors[name]}
         value={getData(dataKey || name) || ''}
@@ -95,12 +110,13 @@ const FormEl: React.FC<FormProps> = ({ fields, buttons = [], submitBtnText = "Su
   }
 
   return (
-    <Form className='use-form' unstackable onSubmit={onSubmit} error={errors.form !== undefined} {...formProps}>
+    <Form className={`use-form ${isDisabled ? 'disabled' : 'editing'}`} unstackable onSubmit={onSubmit} error={errors.form !== undefined} {...formProps}>
       {fields.map((field, i) => field.fields ? renderGroup(field, i) : renderField(field, i))}
 
       {errors.form && <Message negative content={errors.form} />}
-      <Button disabled={isWaiting} color="blue" content={submitBtnText} />
-      {buttons.map((buttonProps, i) => <Button key={i} {...buttonProps} />)}
+      {!isDisabled && <Button disabled={isWaiting} color="blue" content={submitBtnText} />}
+      {!isDisabled && buttons.map((buttonProps, i) => <Button key={i} {...buttonProps} />)}
+      {isEditable && <Button content={isDisabled ? 'Edit' : 'Cancel'} type='button' onClick={() => setIsDisabled(!isDisabled)} />}
     </Form>
   )
 }
