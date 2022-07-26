@@ -65,3 +65,7 @@
   background-color: transparent;
 }
 
+.ui.form [class*="equal width"].fields>.field,
+.ui[class*="equal width"].form .fields>.field {
+  width: unset;
+}

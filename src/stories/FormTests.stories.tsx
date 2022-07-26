@@ -29,7 +29,7 @@ export const Fields = () => {
     <FormProvider>
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
-        <Form disabled submit={submit} fields={[
+        <Form display='edit' submit={submit} fields={[
           {
             name: "",
             widths: 'two',
@@ -59,7 +59,7 @@ export const GroupWithName = () => {
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
         <Header content='Nested Field Groups with Names' />
-        <Form disabled submit={submit} fields={[
+        <Form display='edit' submit={submit} fields={[
           {
             name: 'user', label: 'User',
             fields: [
@@ -123,4 +123,66 @@ export const GroupsWithoutNames = () => {
       </Container>
     </FormProvider>
   )
+}
+export const Disabled = () => {
+  const { Form, data } = useForm()
+  const [message, setMessage] = useState('')
+  const submit: FormSubmitHandler = async (data) => {
+    setMessage(JSON.stringify(data, null, 2))
+    return { data }
+  }
+
+  return (
+    <FormProvider>
+      <Container style={{ marginTop: '1rem' }}>
+        <Header content='@codewizard-dt/use-form-hook' />
+        <Form display='disabled' submit={submit} fields={[
+          {
+            name: "",
+            widths: 'two',
+            fields: [
+              { name: 'best_restaurant' },
+              { name: 'worst_restaurant' }
+            ]
+          }
+        ]}
+        />
+        {message !== '' && <Message>
+          <pre>{message}</pre>
+        </Message>}
+      </Container>
+    </FormProvider>
+  )
+
+}
+export const Toggleable = () => {
+  const { Form, data } = useForm()
+  const [message, setMessage] = useState('')
+  const submit: FormSubmitHandler = async (data) => {
+    setMessage(JSON.stringify(data, null, 2))
+    return { data }
+  }
+
+  return (
+    <FormProvider>
+      <Container style={{ marginTop: '1rem' }}>
+        <Header content='@codewizard-dt/use-form-hook' />
+        <Form display='toggle' submit={submit} fields={[
+          {
+            name: "",
+            widths: 'two',
+            fields: [
+              { name: 'best_restaurant' },
+              { name: 'worst_restaurant' }
+            ]
+          }
+        ]}
+        />
+        {message !== '' && <Message>
+          <pre>{message}</pre>
+        </Message>}
+      </Container>
+    </FormProvider>
+  )
+
 }

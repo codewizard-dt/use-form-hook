@@ -13,8 +13,10 @@ export interface FormProps extends FormPropsUI {
   submit?: FormSubmitHandler
   respond?: ApiResponseHandler<any>
   submitBtnText?: string
-  disabled?: boolean
-  isEditable?: boolean
+  display?: 'disabled' | 'edit' | 'toggle'
+  // disabled?: boolean,
+  // isToggleable?: boolean,
+  // isEditable?: boolean
 }
 
 const defaultSubmit: FormSubmitHandler = async (data) => {
@@ -31,13 +33,12 @@ const FormEl: React.FC<FormProps> = ({
   submitBtnText = "Submit",
   submit = defaultSubmit,
   respond = defaultRespond,
-  disabled = false,
-  isEditable = true,
+  display = 'edit',
   ...formProps }) => {
 
-  const { data, getData, setData, errors, setError, isWaiting, setIsWaiting } = React.useContext(FormContext)
+  const { data, getData, setData, errors, setError, clearErrors, isWaiting, setIsWaiting } = React.useContext(FormContext)
 
-  const [isDisabled, setIsDisabled] = useState<boolean>(disabled)
+  const [isDisabled, setIsDisabled] = useState<boolean>(display !== 'edit')
 
   useEffect(() => {
     for (let [name, value] of Object.entries(getFlatFields(fields))) {
@@ -100,8 +101,8 @@ const FormEl: React.FC<FormProps> = ({
         if (error) { setError('form', error) }
         if (errors) {
           for (let errName in errors) { setError(errName, errors[errName]) }
-          // setError(errors)
         }
+        if (!error && !errors) clearErrors()
         return response
       })
       .then(respond)
@@ -116,7 +117,7 @@ const FormEl: React.FC<FormProps> = ({
       {errors.form && <Message negative content={errors.form} />}
       {!isDisabled && <Button disabled={isWaiting} color="blue" content={submitBtnText} />}
       {!isDisabled && buttons.map((buttonProps, i) => <Button key={i} {...buttonProps} />)}
-      {isEditable && <Button content={isDisabled ? 'Edit' : 'Cancel'} type='button' onClick={() => setIsDisabled(!isDisabled)} />}
+      {display === 'toggle' && <Button content={isDisabled ? 'Edit' : 'Cancel'} type='button' onClick={() => setIsDisabled(!isDisabled)} />}
     </Form>
   )
 }
