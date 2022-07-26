@@ -6,6 +6,7 @@ import { ApiResponseHandler, FormSubmitHandler } from '../types'
 import { getFlatFields } from '../fields/getFlatFields'
 
 import '../../style/form.css'
+import hasChanges from '../fields/hasChanges'
 
 export interface FormProps extends FormPropsUI {
   fields: (Field & FieldGroup)[],
@@ -14,9 +15,6 @@ export interface FormProps extends FormPropsUI {
   respond?: ApiResponseHandler<any>
   submitBtnText?: string
   display?: 'disabled' | 'edit' | 'toggle'
-  // disabled?: boolean,
-  // isToggleable?: boolean,
-  // isEditable?: boolean
 }
 
 const defaultSubmit: FormSubmitHandler = async (data) => {
@@ -93,21 +91,27 @@ const FormEl: React.FC<FormProps> = ({
     </div>
   )
 
+
+
   const onSubmit = () => {
-    setIsWaiting(true)
-    submit(data)
-      .then(response => {
-        const { data, error, errors } = response
-        if (error) { setError('form', error) }
-        if (errors) {
-          for (let errName in errors) { setError(errName, errors[errName]) }
-        }
-        if (!error && !errors) clearErrors()
-        return response
-      })
-      .then(respond)
-      .then(() => setIsWaiting(false))
-      .catch(err => console.log(err))
+    if (hasChanges(fields, data)) {
+      setIsWaiting(true)
+      submit(data)
+        .then(response => {
+          const { data, error, errors } = response
+          if (error) { setError('form', error) }
+          if (errors) {
+            for (let errName in errors) { setError(errName, errors[errName]) }
+          }
+          if (!error && !errors) clearErrors()
+          return response
+        })
+        .then(respond)
+        .then(() => setIsWaiting(false))
+        .catch(err => console.log(err))
+    } else {
+      setError('form', 'No changes')
+    }
   }
 
   return (
@@ -116,7 +120,7 @@ const FormEl: React.FC<FormProps> = ({
 
       {errors.form && <Message negative content={errors.form} />}
       {!isDisabled && <Button disabled={isWaiting} color="blue" content={submitBtnText} />}
-      {!isDisabled && buttons.map((buttonProps, i) => <Button key={i} {...buttonProps} />)}
+      {!isDisabled && buttons.map((buttonProps, i) => <Button key={i} type="button" {...buttonProps} />)}
       {display === 'toggle' && <Button content={isDisabled ? 'Edit' : 'Cancel'} type='button' onClick={() => setIsDisabled(!isDisabled)} />}
     </Form>
   )

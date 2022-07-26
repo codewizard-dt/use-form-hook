@@ -5,7 +5,6 @@
 .ui.form.use-form {
   padding: 0.5rem 1rem;
   border-radius: 5px;
-  /* margin: -1rem; */
 }
 
 .ui.form.use-form .fields {
@@ -34,7 +33,12 @@
 .ui.form.use-form.disabled .field :disabled,
 .ui.form.use-form.disabled .ui.disabled.input {
   opacity: 1;
-  /* background-color: rgb(220,220,220); */
+}
+
+.ui.form.use-form.disabled .required.field>label:after,
+.ui.form.use-form.disabled .required.fields.grouped>label:after,
+.ui.form.use-form.disabled .required.fields:not(.grouped)>.field>label:after {
+  display: none;
 }
 
 .ui.form.use-form.disabled .field select:disabled {
@@ -42,23 +46,15 @@
   border-color: transparent;
   -webkit-appearance: none;
   -moz-appearance: none;
-  /* text-indent: 1px;
-  text-overflow: ''; */
 }
 
-.ui.form.use-form.disabled .field select:disabled,
-.ui.form.use-form.disabled .ui.disabled.input {
-  background-color: rgb(235,235,235);
+.ui.form.use-form.disabled .field :disabled,
+.ui.form.use-form.disabled .ui.disabled.input,
+.ui.form.use-form.disabled .ui.disabled {
+  background-color: rgb(245,245,245);
+  border-color: rgb(230,230,230);
   border-radius: .28571429rem;
 }
-
-/* .ui.form.use-form.disabled  {
-  background-color: rgb(240,240,240);
-} */
-
-/* .ui.form.use-form.disabled .field {
-
-} */
 
 .ui.form.use-form.disabled input {
   border-color: transparent;

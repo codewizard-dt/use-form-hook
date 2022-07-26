@@ -144,7 +144,8 @@ export const Disabled = () => {
               { name: 'best_restaurant' },
               { name: 'worst_restaurant' }
             ]
-          }
+          },
+          { name: 'Reviews', control: 'textarea' }
         ]}
         />
         {message !== '' && <Message>
