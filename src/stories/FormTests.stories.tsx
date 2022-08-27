@@ -30,14 +30,8 @@ export const Fields = () => {
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
         <Form display='edit' submit={submit} fields={[
-          {
-            name: "",
-            widths: 'two',
-            fields: [
-              { name: 'best_restaurant' },
-              { name: 'worst_restaurant' }
-            ]
-          }
+          { name: 'best_restaurant', required: true },
+          { name: 'worst_restaurant' }
         ]}
         />
         {message !== '' && <Message>
@@ -124,6 +118,31 @@ export const GroupsWithoutNames = () => {
     </FormProvider>
   )
 }
+export const DateTime = () => {
+  const { Form } = useForm()
+  const [message, setMessage] = useState('')
+  const submit: FormSubmitHandler = async (data) => {
+    setMessage(JSON.stringify(data, null, 2))
+    return { data }
+  }
+
+  return (
+    <FormProvider>
+      <Container style={{ marginTop: '1rem' }}>
+        <Header content='@codewizard-dt/use-form-hook' />
+        <Form display='edit' submit={submit} fields={[
+          { name: 'start', type: 'datetime' },
+          // { name: 'finish' }
+        ]}
+        />
+        {message !== '' && <Message>
+          <pre>{message}</pre>
+        </Message>}
+      </Container>
+    </FormProvider>
+  )
+
+}
 export const Disabled = () => {
   const { Form, data } = useForm()
   const [message, setMessage] = useState('')
@@ -145,7 +164,9 @@ export const Disabled = () => {
               { name: 'worst_restaurant' }
             ]
           },
-          { name: 'Reviews', control: 'textarea' }
+          {
+            name: 'Reviews', control: 'textarea', initial: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu ultrices diam. Suspendisse venenatis quam ac ultricies gravida. Quisque fringilla metus massa, vitae vestibulum augue faucibus eget. Nam nec libero placerat, porta nulla et, pellentesque metus. Pellentesque vulputate dui et consequat convallis. Proin facilisis sem eu sem sodales, vel iaculis risus gravida. Vivamus quis orci blandit, venenatis nisi rhoncus, porta quam. Morbi quis efficitur massa. Morbi pharetra laoreet laoreet. Quisque egestas dolor ac massa tincidunt, sed aliquet odio suscipit. Praesent enim eros, vestibulum a erat scelerisque, bibendum sollicitudin enim. Aliquam non libero vel magna bibendum eleifend. Sed bibendum ipsum ac orci sodales, sit amet luctus neque iaculis. Vivamus mauris eros, porta vitae erat eget, luctus feugiat nunc.'
+          }
         ]}
         />
         {message !== '' && <Message>
@@ -186,4 +207,28 @@ export const Toggleable = () => {
     </FormProvider>
   )
 
+}
+export const SuccessMessage = () => {
+  const { Form, data } = useForm()
+  const [message, setMessage] = useState('')
+  const submit: FormSubmitHandler = async (data) => {
+    setMessage(JSON.stringify(data, null, 2))
+    return { data }
+  }
+
+  return (
+    <FormProvider>
+      <Container style={{ marginTop: '1rem' }}>
+        <Header content='@codewizard-dt/use-form-hook' />
+        <Form successMessage='Success!' display='edit' submit={submit} fields={[
+          { name: 'best_restaurant' },
+          { name: 'worst_restaurant' }
+        ]}
+        />
+        {message !== '' && <Message>
+          <pre>{message}</pre>
+        </Message>}
+      </Container>
+    </FormProvider>
+  )
 }

@@ -65,3 +65,11 @@
 .ui[class*="equal width"].form .fields>.field {
   width: unset;
 }
+
+.ui.form.use-form textarea {
+  font-family: Lato,
+    'Helvetica Neue',
+    Arial,
+    Helvetica,
+    sans-serif;
+}

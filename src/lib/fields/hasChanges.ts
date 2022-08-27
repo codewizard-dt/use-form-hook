@@ -3,11 +3,10 @@ import { ApiFormData } from '../../context/form';
 import { getFlatObj } from '../dot-notation';
 import { getFlatFields } from './getFlatFields';
 
-export default function (fields: (Field & FieldGroup)[], data: ApiFormData): boolean {
-  const flatInitialValues = getFlatFields(fields)
+export default function (initial: ApiFormData, data: ApiFormData): boolean {
   const flatData = getFlatObj(data)
-  for (let key in flatInitialValues) {
-    if (flatInitialValues[key] !== flatData[key]) return true
+  for (let key in initial) {
+    if (initial[key] !== flatData[key]) return true
   }
   return false
 }

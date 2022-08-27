@@ -13,16 +13,21 @@ export function setDot(dotNotation: string, value: string, obj: KeyedData) {
 }
 
 export function getFlatObj(obj: KeyedData): FlatData {
-  let flat: FlatData = {}
-  for (let [key, value] of Object.entries(obj)) {
-    if (typeof value === 'string') flat[key] = value
-    else {
-      let next = getFlatObj(value)
-      for (let [key2, val2] of Object.entries(next)) {
-        flat[`${key}.${key2}`] = val2
+  try {
+    let flat: FlatData = {}
+    for (let [key, value] of Object.entries(obj)) {
+      if (typeof value === 'string') flat[key] = value
+      else {
+        let next = getFlatObj(value)
+        for (let [key2, val2] of Object.entries(next)) {
+          flat[`${key}.${key2}`] = val2
+        }
       }
     }
+    return flat
+  } catch (error) {
+    console.error(error, { obj })
+    return {}
   }
-  return flat
 }
 

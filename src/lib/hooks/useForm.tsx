@@ -1,4 +1,4 @@
-import { Field, FormContext, FieldGroup, FormContextI, FieldOption } from '../../context/form'
+import { Field, FormContext, FieldGroup, FormContextI, FieldOption, ApiFormData } from '../../context/form';
 import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Header } from "semantic-ui-react"
@@ -7,6 +7,7 @@ import { getFlatFields } from '../fields/getFlatFields'
 
 import '../../style/form.css'
 import hasChanges from '../fields/hasChanges'
+import { getFlatObj } from '../dot-notation';
 
 export interface FormProps extends FormPropsUI {
   fields: (Field & FieldGroup)[],
@@ -15,6 +16,7 @@ export interface FormProps extends FormPropsUI {
   respond?: ApiResponseHandler<any>
   submitBtnText?: string
   display?: 'disabled' | 'edit' | 'toggle'
+  successMessage?: string
 }
 
 const defaultSubmit: FormSubmitHandler = async (data) => {
@@ -32,17 +34,23 @@ const FormEl: React.FC<FormProps> = ({
   submit = defaultSubmit,
   respond = defaultRespond,
   display = 'edit',
+  successMessage,
   ...formProps }) => {
 
   const { data, getData, setData, errors, setError, clearErrors, isWaiting, setIsWaiting } = React.useContext(FormContext)
 
   const [isDisabled, setIsDisabled] = useState<boolean>(display !== 'edit')
+  const [initial, setInitial] = useState<ApiFormData>(getFlatFields(fields))
+  const [message, setMessage] = useState<string | null>(null)
 
   useEffect(() => {
     for (let [name, value] of Object.entries(getFlatFields(fields))) {
       setData(name, value)
     }
   }, [])
+  useEffect(() => {
+    setIsDisabled(display !== 'edit')
+  }, [display])
 
   const formatLabelStr = (str: string): string => unsnakeCase(upperFirst(str))
 
@@ -63,6 +71,9 @@ const FormEl: React.FC<FormProps> = ({
     )
   }
   const renderField = ({ name, dataKey, type = 'text', control = Input, options, label, useLabel = true, group, ...fieldProps }: Field, i: number | string) => {
+    const requiredWarning = () => {
+      if (fieldProps.required && (getData(dataKey || name) || '') === '') setError(name, 'Required')
+    }
     return (
       <FormField key={i}
         name={name}
@@ -73,6 +84,7 @@ const FormEl: React.FC<FormProps> = ({
         error={errors[name]}
         value={getData(dataKey || name) || ''}
         control={control}
+        onBlur={requiredWarning}
         onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData(dataKey || name, ev.target.value) }}
         {...fieldProps} />
     )
@@ -91,19 +103,25 @@ const FormEl: React.FC<FormProps> = ({
     </div>
   )
 
-
-
   const onSubmit = () => {
-    if (hasChanges(fields, data)) {
+    if (hasChanges(initial, data)) {
       setIsWaiting(true)
       submit(data)
         .then(response => {
-          const { data, error, errors } = response
-          if (error) { setError('form', error) }
+          const { error, errors } = response
+          if (error) {
+            setError('form', error)
+            setMessage(null)
+          }
           if (errors) {
             for (let errName in errors) { setError(errName, errors[errName]) }
+            setMessage(null)
           }
-          if (!error && !errors) clearErrors()
+          if (!error && !errors) {
+            clearErrors()
+            setInitial(getFlatObj(data))
+            if (successMessage) setMessage(successMessage)
+          }
           return response
         })
         .then(respond)
@@ -111,14 +129,15 @@ const FormEl: React.FC<FormProps> = ({
         .catch(err => console.log(err))
     } else {
       setError('form', 'No changes')
+      setMessage(null)
     }
   }
 
   return (
     <Form className={`use-form ${isDisabled ? 'disabled' : 'editing'}`} unstackable onSubmit={onSubmit} error={errors.form !== undefined} {...formProps}>
       {fields.map((field, i) => field.fields ? renderGroup(field, i) : renderField(field, i))}
-
       {errors.form && <Message negative content={errors.form} />}
+      {message && <Message positive content={message} />}
       {!isDisabled && <Button disabled={isWaiting} color="blue" content={submitBtnText} />}
       {!isDisabled && buttons.map((buttonProps, i) => <Button key={i} type="button" {...buttonProps} />)}
       {display === 'toggle' && <Button content={isDisabled ? 'Edit' : 'Cancel'} type='button' onClick={() => setIsDisabled(!isDisabled)} />}
