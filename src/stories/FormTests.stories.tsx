@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { within, userEvent } from '@storybook/testing-library';
 import { FormTests } from './FormTests';
 import { Container, Dropdown, Header, Message } from 'semantic-ui-react';
 import { FormProvider } from '../context/form'
 import { FormSubmitHandler, useForm } from '../lib'
+import validator from 'validator';
 
 export default {
   title: 'Example/Form',
@@ -32,6 +33,31 @@ export const Fields = () => {
         <Form display='edit' submit={submit} fields={[
           { name: 'best_restaurant', required: true },
           { name: 'worst_restaurant' }
+        ]}
+        />
+        {message !== '' && <Message>
+          <pre>{message}</pre>
+        </Message>}
+      </Container>
+    </FormProvider>
+  )
+}
+export const Validators = () => {
+  const { Form, data, errors } = useForm()
+  const [message, setMessage] = useState('')
+  const submit: FormSubmitHandler = async (data) => {
+
+    setMessage(JSON.stringify(data, null, 2))
+    return { data }
+  }
+
+  return (
+    <FormProvider>
+      <Container style={{ marginTop: '1rem' }}>
+        <Header content='@codewizard-dt/use-form-hook' />
+        <Form display='edit' submit={submit} fields={[
+          { name: 'best_restaurant', required: true },
+          { name: 'email', required: true, validators: [validator.isEmail, 'Invalid email'] }
         ]}
         />
         {message !== '' && <Message>

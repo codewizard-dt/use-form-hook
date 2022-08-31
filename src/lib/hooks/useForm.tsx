@@ -1,4 +1,4 @@
-import { Field, FormContext, FieldGroup, FormContextI, FieldOption, ApiFormData } from '../../context/form';
+import { Field, FormContext, FieldGroup, FormContextI, FieldOption, ApiFormData, ValidatorWithMsg } from '../../context/form';
 import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Header } from "semantic-ui-react"
@@ -8,6 +8,7 @@ import { getFlatFields } from '../fields/getFlatFields'
 import '../../style/form.css'
 import hasChanges from '../fields/hasChanges'
 import { getFlatObj } from '../dot-notation';
+import { uniq } from 'lodash';
 
 export interface FormProps extends FormPropsUI {
   fields: (Field & FieldGroup)[],
@@ -70,9 +71,38 @@ const FormEl: React.FC<FormProps> = ({
       </>
     )
   }
-  const renderField = ({ name, dataKey, type = 'text', control = Input, options, label, useLabel = true, group, ...fieldProps }: Field, i: number | string) => {
-    const requiredWarning = () => {
-      if (fieldProps.required && (getData(dataKey || name) || '') === '') setError(name, 'Required')
+  const renderField = ({ name, dataKey, type = 'text', control = Input, options, label, useLabel = true, group, validators, ...fieldProps }: Field, i: number | string) => {
+    const value = getData(dataKey || name) || ''
+
+    const requiredWarning = (): boolean => {
+      const missingAndRequired = fieldProps.required && value === ''
+      console.log(value, name)
+      missingAndRequired ? setError(name, 'Required') : clearErrors(name)
+      return missingAndRequired
+    }
+    const validate = (): boolean => {
+      if (requiredWarning()) return true
+      // let value = getData(dataKey || name) || ''
+      if (typeof value !== 'string') return true
+      else {
+        if (!validators) return true
+        else if (value === '' && !fieldProps.required) return true
+        else if (Array.isArray(validators[0])) {
+          let fieldErrors = []
+          for (let [fn, msg = 'Invalid response'] of validators as ValidatorWithMsg[]) {
+            if (!fn(value)) fieldErrors.push(msg)
+          }
+          let isValid = fieldErrors.length === 0
+          isValid ? clearErrors(name) : setError(name, uniq(fieldErrors).join('\n'))
+          return isValid
+        }
+        else {
+          let [fn, msg = 'Invalid response'] = validators as ValidatorWithMsg
+          let isValid = fn(value)
+          isValid ? clearErrors(name) : setError(name, msg)
+          return isValid
+        }
+      }
     }
     return (
       <FormField key={i}
@@ -84,7 +114,7 @@ const FormEl: React.FC<FormProps> = ({
         error={errors[name]}
         value={getData(dataKey || name) || ''}
         control={control}
-        onBlur={requiredWarning}
+        onBlur={validate}
         onChange={(ev: ChangeEvent<HTMLInputElement>) => { setData(dataKey || name, ev.target.value) }}
         {...fieldProps} />
     )

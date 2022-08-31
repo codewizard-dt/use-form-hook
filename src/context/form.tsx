@@ -1,14 +1,18 @@
 import React, { PropsWithChildren, Reducer, useReducer, useState } from "react"
 import { Form, FormFieldProps, FormGroupProps } from "semantic-ui-react"
 import { KeyedData, getDot, setDot } from "../lib/dot-notation"
+import validator from 'validator'
 
 export type FieldOption = string | { value: string, label: string }
+export type FieldValidator = (value: string) => boolean
+export type ValidatorWithMsg = [FieldValidator, string | undefined]
 export interface Field extends FormFieldProps {
   name: string,
   dataKey?: string,
   useLabel?: boolean
   initial?: string,
-  options?: FieldOption[]
+  options?: FieldOption[],
+  validators?: ValidatorWithMsg | ValidatorWithMsg[]
 }
 export interface FieldGroup extends FormGroupProps {
   fields?: Field[]
@@ -22,7 +26,7 @@ export interface FormContextI {
   getError: (key: string) => KeyedData | string | undefined
   setError: (key: string, value: string) => void
   clearData: () => void
-  clearErrors: () => void
+  clearErrors: (key?: string) => void
   isWaiting: boolean
   setIsWaiting: (isWaiting: boolean) => void
 }
@@ -43,12 +47,17 @@ export const FormContext = React.createContext<FormContextI>({
 })
 
 type ClearAction = { type: 'CLEAR' }
+type ClearKey = { type: 'CLEAR_KEY', payload: string }
 type AddToSet = { type: 'ADD', payload: [string, string] }
 
-const reducer: Reducer<ApiFormData, ClearAction | AddToSet> = (data, action) => {
+const reducer: Reducer<ApiFormData, ClearAction | ClearKey | AddToSet> = (data, action) => {
   switch (action.type) {
     case ('CLEAR'):
       return {}
+    case ('CLEAR_KEY'):
+      let fresh = { ...data }
+      delete fresh[action.payload]
+      return fresh
     case ('ADD'):
       const [key, value] = action.payload
       return setDot(key, value, { ...data })
@@ -70,7 +79,11 @@ export const FormProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }
 
   const clearData = () => { dispatchData({ type: 'CLEAR' }) }
-  const clearErrors = () => { dispatchErrors({ type: 'CLEAR' }) }
+  const clearErrors = (key?: string) => {
+    key
+      ? dispatchErrors({ type: 'CLEAR_KEY', payload: key })
+      : dispatchErrors({ type: 'CLEAR' })
+  }
 
   const [isWaiting, setIsWaiting] = useState<boolean>(false)
 
