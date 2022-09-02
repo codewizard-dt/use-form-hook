@@ -156,7 +156,11 @@ const FormEl: React.FC<FormProps> = ({
         })
         .then(respond)
         .then(() => setIsWaiting(false))
-        .catch(err => console.log(err))
+        .catch(err => {
+          if (err.message) setError('form', err.message)
+          respond(err)
+          console.error(err)
+        })
     } else {
       setError('form', 'No changes')
       setMessage(null)
