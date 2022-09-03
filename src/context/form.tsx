@@ -1,5 +1,5 @@
 import React, { PropsWithChildren, Reducer, useReducer, useState } from "react"
-import { Form, FormFieldProps, FormGroupProps } from "semantic-ui-react"
+import { Form, FormFieldProps, FormGroupProps, StrictDropdownItemProps } from "semantic-ui-react"
 import { KeyedData, getDot, setDot } from "../lib/dot-notation"
 import validator from 'validator'
 
@@ -11,7 +11,7 @@ export interface Field extends FormFieldProps {
   dataKey?: string,
   useLabel?: boolean
   initial?: string,
-  options?: FieldOption[],
+  options?: StrictDropdownItemProps[],
   validators?: ValidatorWithMsg | ValidatorWithMsg[]
 }
 export interface FieldGroup extends FormGroupProps {

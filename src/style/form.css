@@ -11,7 +11,6 @@
   flex-wrap: wrap;
 }
 
-
 .ui.form.use-form .fields > .form-group {
   flex-basis: 100%;
   margin-top: 1.5em;
@@ -21,6 +20,16 @@
 
 .ui.form.use-form .form-group + .form-group {
   margin-top: 1.5em;
+}
+
+.ui.form.use-form .ui.dropdown {
+  padding: 0.57857143em 1em;
+  border: 1px solid rgba(34, 36, 38, .15);
+  border-radius: .28571429rem;
+  user-select: none;
+}
+.ui.form.use-form .ui.dropdown:focus{
+  border-color: #85b7d9;
 }
 
 .ui.form.use-form.disabled .field.disabled>label,
@@ -66,6 +75,13 @@
   width: unset;
 }
 
+.ui.form .field[class*="wide field"] {
+  display: inline-block;
+}
+.ui.form .field[class*="wide field"]:not(:last-child) {
+  padding-right: 1rem;
+}
+
 .ui.form.use-form textarea {
   font-family: Lato,
     'Helvetica Neue',
@@ -73,3 +89,4 @@
     Helvetica,
     sans-serif;
 }
+
