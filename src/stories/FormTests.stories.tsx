@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ComponentStory, ComponentMeta } from '@storybook/react';
 import { within, userEvent } from '@storybook/testing-library';
 import { FormTests } from './FormTests';
-import { Container, Dropdown, Header, Message } from 'semantic-ui-react';
+import { Container, Dropdown, Header, Message, Rating } from 'semantic-ui-react';
 import { FormProvider } from '../context/form'
 import { FormSubmitHandler, useForm } from '../lib'
 import validator from 'validator';
@@ -16,7 +16,7 @@ export default {
   },
 } as ComponentMeta<typeof FormTests>;
 
-const Template: ComponentStory<typeof FormTests> = (args) => <FormTests {...args} />;
+// const Template: ComponentStory<typeof FormTests> = (args) => <FormTests {...args} />;
 
 export const Fields = () => {
   const { Form, data } = useForm()
@@ -56,6 +56,35 @@ export const DropdownField = () => {
         <Header content='@codewizard-dt/use-form-hook' />
         <Form display='edit' submit={submit} fields={[
           { name: 'username', width: '8' },
+          {
+            name: 'best_restaurant', type: 'dropdown', width: '8', control: Dropdown, options: [
+              { text: 'Chipotle', value: 'CHIPOTLE' },
+              { text: 'Olive Garden', value: 'HELL' }
+            ]
+          },
+        ]}
+        />
+        {message !== '' && <Message>
+          <pre>{message}</pre>
+        </Message>}
+      </Container>
+    </FormProvider>
+  )
+}
+export const RatingField = () => {
+  const { Form, data } = useForm()
+  const [message, setMessage] = useState('')
+  const submit: FormSubmitHandler = async (data) => {
+    setMessage(JSON.stringify(data, null, 2))
+    return { data }
+  }
+
+  return (
+    <FormProvider>
+      <Container style={{ marginTop: '1rem' }}>
+        <Header content='@codewizard-dt/use-form-hook' />
+        <Form display='edit' submit={submit} fields={[
+          { name: 'rating', control: Rating, icon: 'star', initial: '2', maxRating: 10 },
           {
             name: 'best_restaurant', type: 'dropdown', width: '8', control: Dropdown, options: [
               { text: 'Chipotle', value: 'CHIPOTLE' },

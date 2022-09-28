@@ -1,7 +1,7 @@
 import { Field, FormContext, FieldGroup, FormContextI, FieldOption, ApiFormData, ValidatorWithMsg } from '../../context/form';
 import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect, useState } from "react"
-import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Header, Dropdown } from "semantic-ui-react"
+import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Header, Dropdown, TextArea, Rating } from "semantic-ui-react"
 import { ApiResponseHandler, FormSubmitHandler } from '../types'
 import { getFlatFields } from '../fields/getFlatFields'
 
@@ -21,6 +21,9 @@ export interface FormProps extends FormPropsUI {
 }
 interface ChangeEvData {
   value: string
+}
+interface RateEvData {
+  rating: string
 }
 
 const defaultSubmit: FormSubmitHandler = async (data) => {
@@ -60,6 +63,11 @@ const FormEl: React.FC<FormProps> = ({
 
   const renderField = ({ name, dataKey, type = 'text', control = Input, label, useLabel = true, group, validators, ...fieldProps }: Field, i: number | string) => {
     if (control === 'select') control = Dropdown
+    else if (control === 'textarea') control = TextArea
+    else if (control === Rating) {
+      fieldProps.onRate = (ev: any, { rating }: RateEvData) => { setData(dataKey || name, rating) }
+      fieldProps.defaultRating = getData(dataKey || name) || initial[dataKey || name] || '5'
+    }
 
     const value = getData(dataKey || name) || ''
     const requiredWarning = (): boolean => {
@@ -98,10 +106,12 @@ const FormEl: React.FC<FormProps> = ({
         type={type}
         disabled={isDisabled}
         error={errors[name]}
-        value={getData(dataKey || name) || ''}
+        value={getData(dataKey || name) || initial[dataKey || name] || ''}
         control={control}
         onBlur={validate}
         onChange={(ev: any, { value }: ChangeEvData) => { setData(dataKey || name, value) }}
+        // {...control === Rating && {}}
+        // onRate={control !== Rating ? undefined : (ev: any, { rating }: RateEvData) => { setData(dataKey || name, rating) }}
         {...fieldProps} />
     )
   }
@@ -123,7 +133,7 @@ const FormEl: React.FC<FormProps> = ({
     if (hasChanges(initial, data)) {
       setIsWaiting(true)
       submit(data)
-        .then(response => {
+        .then((response = {}) => {
           const { error, errors } = response
           if (error) {
             setError('form', error)
