@@ -14,6 +14,8 @@ function increment(type = 'PATCH') {
     if (typeof type === 'string') type = versionType[type]
     if (typeof type !== 'number' || type > 2) throw new Error(`Version type ${type} not valid`)
     version[type] = Number(version[type]) + 1
+    if (type === 1) version[2] = 0
+    else if (type === 0) version[1] = version[2] = 0
   } catch (error) {
     console.error(error)
   }
@@ -22,6 +24,7 @@ function increment(type = 'PATCH') {
 increment(process.env.VERSION || "PATCH")
 
 packageJson.version = version.join('.')
+console.log(`New Version: ${version.join('.')}`)
 const text = JSON.stringify(packageJson, null, 2)
 
 try {

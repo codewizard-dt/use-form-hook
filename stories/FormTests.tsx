@@ -1,10 +1,10 @@
 import React, { PropsWithChildren, useState } from 'react'
 import { Container, Header, Message } from 'semantic-ui-react'
 import { Field, FieldGroup } from 'src/context'
-import { useForm } from '../lib/hooks/useForm'
+import { useForm } from '../src/lib/hooks/useForm'
 import 'semantic-ui-css/semantic.min.css'
-import { FormProvider } from '../context/form'
-import { FormSubmitHandler } from '../lib'
+import { FormProvider } from '../src/context/form'
+import { FormSubmitHandler } from '../src/lib'
 
 export interface FormTestsProps extends PropsWithChildren {
   fields: (Field & FieldGroup)[]

@@ -1,7 +1,6 @@
-import React, { PropsWithChildren, Reducer, useReducer, useState } from "react"
-import { Form, FormFieldProps, FormGroupProps, StrictDropdownItemProps } from "semantic-ui-react"
+import React, { PropsWithChildren, Reducer, useContext, useReducer, useState } from "react"
+import { FormFieldProps, FormGroupProps, StrictDropdownItemProps } from "semantic-ui-react"
 import { KeyedData, getDot, setDot } from "../lib/dot-notation"
-import validator from 'validator'
 
 export type FieldOption = string | { value: string, label: string }
 export type FieldValidator = (value: string) => boolean
@@ -45,6 +44,8 @@ export const FormContext = React.createContext<FormContextI>({
   isWaiting: false,
   setIsWaiting: () => { }
 })
+
+export const useFormContext = () => useContext(FormContext)
 
 type ClearAction = { type: 'CLEAR' }
 type ClearKey = { type: 'CLEAR_KEY', payload: string }

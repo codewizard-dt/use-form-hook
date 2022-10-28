@@ -2,6 +2,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
 import typescript from '@rollup/plugin-typescript'
 import dts from 'rollup-plugin-dts'
+import emitFiles from 'rollup-plugin-emit-files'
 import postcss from "rollup-plugin-postcss";
 import postcssImport from "postcss-import";
 import autoprefixer from "autoprefixer";
@@ -37,6 +38,7 @@ export default [
       postcss({
         plugins: [postcssImport(), autoprefixer()],
       }),
+      emitFiles({ src: 'src' })
 
     ],
   },

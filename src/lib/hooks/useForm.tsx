@@ -64,9 +64,21 @@ const FormEl: React.FC<FormProps> = ({
   const renderField = ({ name, dataKey, type = 'text', control = Input, label, useLabel = true, group, validators, ...fieldProps }: Field, i: number | string) => {
     if (control === 'select') control = Dropdown
     else if (control === 'textarea') control = TextArea
-    else if (control === Rating) {
-      fieldProps.onRate = (ev: any, { rating }: RateEvData) => { setData(dataKey || name, rating) }
-      fieldProps.defaultRating = getData(dataKey || name) || initial[dataKey || name] || '5'
+
+    if (control === Rating) {
+      let ratingDefaults = {
+        onRate: (ev: any, { rating }: RateEvData) => { setData(dataKey || name, `${rating}`) },
+        defaultRating: getData(dataKey || name) || initial[dataKey || name] || '5',
+        icon: 'star', maxRating: 10
+      }
+      setTimeout(() => { if (!getData(dataKey || name)) setData(dataKey || name, ratingDefaults.defaultRating) }, 0)
+      fieldProps = { ...ratingDefaults, ...fieldProps }
+    } else if (control === Dropdown) {
+      let options = fieldProps.options
+      if (!options) throw new Error('Options not given for Dropdown')
+      let firstValue = typeof options[0] === 'string' ? options[0] : options[0].value
+      let defaultValue = getData(dataKey || name) || initial[dataKey || name] || firstValue
+      setTimeout(() => { if (!getData(dataKey || name)) setData(dataKey || name, defaultValue) }, 0)
     }
 
     const value = getData(dataKey || name) || ''
@@ -106,12 +118,10 @@ const FormEl: React.FC<FormProps> = ({
         type={type}
         disabled={isDisabled}
         error={errors[name]}
-        value={getData(dataKey || name) || initial[dataKey || name] || ''}
+        value={getData(dataKey || name) || ''}
         control={control}
         onBlur={validate}
         onChange={(ev: any, { value }: ChangeEvData) => { setData(dataKey || name, value) }}
-        // {...control === Rating && {}}
-        // onRate={control !== Rating ? undefined : (ev: any, { rating }: RateEvData) => { setData(dataKey || name, rating) }}
         {...fieldProps} />
     )
   }
@@ -159,7 +169,7 @@ const FormEl: React.FC<FormProps> = ({
           console.error(err)
         })
     } else {
-      setError('form', 'No changes')
+      // setError('form', 'No changes')
       setMessage(null)
     }
   }
@@ -170,7 +180,7 @@ const FormEl: React.FC<FormProps> = ({
       <div>
         {errors.form && <Message negative content={errors.form} />}
         {message && <Message positive content={message} />}
-        {!isDisabled && <Button disabled={isWaiting} color="blue" content={submitBtnText} />}
+        {!isDisabled && <Button disabled={isWaiting || !hasChanges(initial, data)} color="blue" content={submitBtnText} />}
         {!isDisabled && buttons.map((buttonProps, i) => <Button key={i} type="button" {...buttonProps} />)}
         {display === 'toggle' && <Button content={isDisabled ? 'Edit' : 'Cancel'} type='button' onClick={() => setIsDisabled(!isDisabled)} />}
       </div>
@@ -178,9 +188,7 @@ const FormEl: React.FC<FormProps> = ({
   )
 }
 
-export interface UseForm extends FormContextI {
-  Form: React.FC<FormProps>
-}
+export type UseForm = React.FC<FormProps>
 
 export const useForm = (): UseForm => {
   const context = React.useContext(FormContext)
@@ -190,8 +198,5 @@ export const useForm = (): UseForm => {
     context.clearErrors();
   }, [])
 
-  return {
-    Form: FormEl,
-    ...context
-  }
+  return FormEl
 }
