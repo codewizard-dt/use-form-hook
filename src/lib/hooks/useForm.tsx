@@ -13,7 +13,7 @@ import { uniq } from 'lodash';
 export interface FormProps extends FormPropsUI {
   fields: (Field & FieldGroup)[],
   buttons?: ButtonProps[]
-  submit?: FormSubmitHandler<any>
+  submit?: FormSubmitHandler
   respond?: FormResponseHandler<any>
   submitBtnText?: string
   display?: 'disabled' | 'edit' | 'toggle'
@@ -26,12 +26,13 @@ interface RateEvData {
   rating: string
 }
 
-const defaultSubmit: FormSubmitHandler<any> = async (data) => {
+const defaultSubmit: FormSubmitHandler = async (data) => {
   console.log('Submit data', data)
   return data
 }
-const defaultRespond: FormResponseHandler<any> = (response) => {
-  console.log('Response data', response)
+const defaultRespond: FormResponseHandler<any> = (data) => {
+  console.log('Response data', data)
+  return data
 }
 
 const FormEl: React.FC<FormProps> = ({
@@ -143,7 +144,7 @@ const FormEl: React.FC<FormProps> = ({
     if (hasChanges(initial, data)) {
       setIsWaiting(true)
       submit(data)
-        .then((response) => {
+        .then((response = {}) => {
           const { error, errors } = response
           if (error) {
             setError('form', error)

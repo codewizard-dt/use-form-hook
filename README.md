@@ -64,7 +64,7 @@ There are defaults for the submit and respond properties. If you don't include t
 import { useForm } from "@codewizard-dt/use-form-hook";
 const ChildComponent = (props) => {
   const { Form } = useForm();
-  return <Form fields={[]} submit={submitHandler} respond={responseTransformer} />;
+  return <Form fields={[]} submit={submitHandler} respond={responseHandler} />;
 };
 ```
 
