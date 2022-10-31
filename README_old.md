@@ -87,14 +87,14 @@ Each field can receive any of the [FormFieldProps](https://react.semantic-ui.com
 The submit property must be of the type `FormSubmitHandler` which is defined by this package. This is a function that receives the form data and return a promise.
 
 ```typescript
-interface ApiResponse<T> {
+interface FormResponse<T> {
   data?: T;
   error?: string;
   errors?: { [key: string]: string };
 }
 // the data object passed to the `submit` function is a map of all the `Fields`
 // data = {[fieldName]: fieldValue}
-type FormSubmitHandler = (data: ApiFormData) => Promise<ApiResponse<any>>;
+type FormSubmitHandler = (data: ApiFormData) => Promise<FormResponse<any>>;
 ```
 
 ```tsx
@@ -119,20 +119,20 @@ const defaultSubmit: FormSubmitHandler = async (data) => {
 
 ## Respond property
 
-The respond property must be of the type `ApiResponseHandler` which is defined by this package. This is a function that receives the response object and does something with it.
+The respond property must be of the type `FormResponseHandler` which is defined by this package. This is a function that receives the response object and does something with it.
 
 ```typescript
-interface ApiResponse<T> {
+interface FormResponse<T> {
   data?: T;
   error?: string;
   errors?: { [key: string]: string };
 }
-type ApiResponseHandler<T> = (response: ApiResponse<T>) => void;
+type FormResponseHandler<T> = (response: FormResponse<T>) => void;
 ```
 
 ```tsx
 // If you don't include a `respond` property, you will see the response in the console
-const defaultRespond: ApiResponseHandler<any> = (data) => {
+const defaultRespond: FormResponseHandler<any> = (data) => {
   console.log("Response data", data);
 };
 ```

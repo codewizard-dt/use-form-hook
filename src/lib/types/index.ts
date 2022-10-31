@@ -3,7 +3,7 @@ import { ApiFormData } from "../../context/form"
 /**
  * The structure of the API response expected
  */
-export type ApiResponse<T> = {
+export type FormResponse<T = any> = {
   data?: T,
   error?: any,
   errors?: {
@@ -11,13 +11,12 @@ export type ApiResponse<T> = {
   }
 }
 
-
 /**
  * Defines the `submit` property which sends the form data to the Api 
  * Must return a promise
  */
-export type FormSubmitHandler = (data: ApiFormData) => Promise<ApiResponse<any>>
+export type FormSubmitHandler<T = any> = (data: ApiFormData) => Promise<FormResponse<T>>
 /**
- * Defines the `respond` property which receives the ApiResponse
+ * Defines the `respond` property which receives the FormResponse
  */
-export type ApiResponseHandler<T> = (response: ApiResponse<T>) => void
+export type FormResponseHandler<T = any> = (response: T) => void

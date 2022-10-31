@@ -2,7 +2,7 @@ import { Field, FormContext, FieldGroup, FormContextI, FieldOption, ApiFormData,
 import { unsnakeCase, upperFirst } from '../text'
 import React, { ChangeEvent, useEffect, useState } from "react"
 import { Button, ButtonProps, Form, FormProps as FormPropsUI, FormField, FormGroup, Input, Message, Header, Dropdown, TextArea, Rating } from "semantic-ui-react"
-import { ApiResponseHandler, FormSubmitHandler } from '../types'
+import { FormResponseHandler, FormSubmitHandler } from '../types'
 import { getFlatFields } from '../fields/getFlatFields'
 
 import '../../style/form.css'
@@ -13,8 +13,8 @@ import { uniq } from 'lodash';
 export interface FormProps extends FormPropsUI {
   fields: (Field & FieldGroup)[],
   buttons?: ButtonProps[]
-  submit?: FormSubmitHandler
-  respond?: ApiResponseHandler<any>
+  submit?: FormSubmitHandler<any>
+  respond?: FormResponseHandler<any>
   submitBtnText?: string
   display?: 'disabled' | 'edit' | 'toggle'
   successMessage?: string
@@ -26,12 +26,12 @@ interface RateEvData {
   rating: string
 }
 
-const defaultSubmit: FormSubmitHandler = async (data) => {
+const defaultSubmit: FormSubmitHandler<any> = async (data) => {
   console.log('Submit data', data)
   return data
 }
-const defaultRespond: ApiResponseHandler<any> = (data) => {
-  console.log('Response data', data)
+const defaultRespond: FormResponseHandler<any> = (response) => {
+  console.log('Response data', response)
 }
 
 const FormEl: React.FC<FormProps> = ({
@@ -143,7 +143,7 @@ const FormEl: React.FC<FormProps> = ({
     if (hasChanges(initial, data)) {
       setIsWaiting(true)
       submit(data)
-        .then((response = {}) => {
+        .then((response) => {
           const { error, errors } = response
           if (error) {
             setError('form', error)

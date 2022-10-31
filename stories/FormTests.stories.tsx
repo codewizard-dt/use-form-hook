@@ -4,7 +4,7 @@ import { within, userEvent } from '@storybook/testing-library';
 import { FormTests } from './FormTests';
 import { Container, Dropdown, Header, Message, Rating } from 'semantic-ui-react';
 import { FormProvider, useFormContext } from '../src/context/form'
-import { FormSubmitHandler, useForm } from '../src/lib'
+import { FormResponseHandler, FormSubmitHandler, useForm } from '../src/lib'
 import validator from 'validator';
 
 export default {
@@ -75,9 +75,9 @@ export const DropdownField = () => {
 }
 export const RatingField = () => {
   const Form = useForm()
-  const { data } = useFormContext()
+  // const { data } = useFormContext()
   const [message, setMessage] = useState('')
-  const submit: FormSubmitHandler = async (data) => {
+  const respond: FormResponseHandler = async (data) => {
     setMessage(JSON.stringify(data, null, 2))
     return { data }
   }
@@ -86,7 +86,7 @@ export const RatingField = () => {
     <FormProvider>
       <Container style={{ marginTop: '1rem' }}>
         <Header content='@codewizard-dt/use-form-hook' />
-        <Form display='edit' submit={submit} fields={[
+        <Form display='edit' respond={respond} fields={[
           { name: 'rating', control: Rating },
           {
             name: 'best_restaurant', type: 'dropdown', width: '8', control: Dropdown, options: [
@@ -105,7 +105,7 @@ export const RatingField = () => {
 }
 export const Validators = () => {
   const Form = useForm()
-  const { data } = useFormContext()
+  // const { data } = useFormContext()
   const [message, setMessage] = useState('')
   const submit: FormSubmitHandler = async (data) => {
 

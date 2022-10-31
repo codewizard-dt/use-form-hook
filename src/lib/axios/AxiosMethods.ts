@@ -1,14 +1,7 @@
 
-import { AxiosResponse, AxiosResponseTransformer } from "axios"
-import { ApiResponse } from "../types"
+import { AxiosResponse } from "axios"
+import { FormResponse } from "../types"
 
-export const parseJson: AxiosResponseTransformer = (data, headers) => {
-  try {
-    return JSON.parse(data)
-  } catch (error) {
-    return data
-  }
-}
-export function responseHandler<T = unknown>({ data: { data, error, errors } }: AxiosResponse<ApiResponse<T>>) {
+export function responseTransformer<T = unknown>({ data: { data, error, errors } }: AxiosResponse<FormResponse<T>>) {
   return { data, error, errors }
 }
