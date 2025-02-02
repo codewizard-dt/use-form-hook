@@ -1,6 +1,6 @@
-const fs = require('fs')
-const path = require('path')
-const packageJson = require('../package.json')
+import fs from 'fs'
+import path from 'path'
+import packageJson from '../package.json'
 
 const versionType = {
   "MAJOR": 0,

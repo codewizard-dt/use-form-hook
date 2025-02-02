@@ -1,67 +1,106 @@
-import React, { useEffect, useState } from 'react';
-import { ComponentStory, ComponentMeta } from '@storybook/react';
-import { within, userEvent } from '@storybook/testing-library';
+import React, { useState } from 'react';
+import type { Meta, StoryObj } from '@storybook/react';
 import { FormTests } from './FormTests';
-import { Container, Dropdown, Header, Message, Rating } from 'semantic-ui-react';
-import { FormProvider, useFormContext } from '../src/context/form'
-import { FormResponseHandler, FormSubmitHandler, useForm } from '../src/lib'
-import validator from 'validator';
+import { FormProvider, useFormContext } from '../src/context/form';
+import { FormSubmitHandler, useForm } from '../src/lib';
+import { Message } from '../src/lib/components/Message';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export default {
+// Create a shared QueryClient configuration
+const createTestQueryClient = () => new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+    }
+  }
+});
+
+const meta: Meta<typeof FormTests> = {
   title: 'Example/Form',
   component: FormTests,
   parameters: {
-    // More on Story layout: https://storybook.js.org/docs/react/configure/story-layout
-    layout: 'fullscreen',
+    layout: 'fullscreen'
   },
-} as ComponentMeta<typeof FormTests>;
+  // Add a decorator that provides both QueryClient and FormProvider
+  decorators: [
+    (Story) => {
+      const queryClient = createTestQueryClient();
+      return (
+        <QueryClientProvider client={queryClient}>
+          <FormProvider>
+            <Story />
+          </FormProvider>
+        </QueryClientProvider>
+      );
+    }
+  ]
+};
 
-// const Template: ComponentStory<typeof FormTests> = (args) => <FormTests {...args} />;
+export default meta;
+type Story = StoryObj<typeof FormTests>;
 
-export const Fields = () => {
-  const Form = useForm()
-  const { data } = useFormContext()
-  const [message, setMessage] = useState('')
-  const submit: FormSubmitHandler = async (data) => {
-    setMessage(JSON.stringify(data, null, 2))
-    return { data }
-  }
+export const Fields: Story = {
+  render: () => {
+    const Test = useForm({
+      mutationFn: async () => {
+        console.log(data);
+        return { data };
+      },
+      transaction: {
+        name: 'FormTests',
+        description: 'FormTests',
+        op: 'form.submit'
+      }
+    });
+    const { data } = useFormContext();
+    const [message, setMessage] = useState('');
+    const submit: FormSubmitHandler = async (data) => {
+      setMessage(JSON.stringify(data, null, 2));
+      return { data };
+    };
 
-  return (
-    <FormProvider>
-      <Container style={{ marginTop: '1rem' }}>
-        <Header content='@codewizard-dt/use-form-hook' />
-        <Form display='edit' submit={submit} fields={[
-          { name: 'best_restaurant', required: true },
-          { name: 'worst_restaurant' }
+    return (
+      <div>
+        <Test.Form mutation={Test.mutation} fields={[
+          { name: 'best_restaurant', label: 'Best Restaurant', type: 'text', required: true },
+          { name: 'worst_restaurant', label: 'Worst Restaurant', type: 'text' }
         ]}
         />
-        {message !== '' && <Message>
-          <pre>{message}</pre>
-        </Message>}
-      </Container>
-    </FormProvider>
-  )
-}
-export const DropdownField = () => {
-  const Form = useForm()
-  const { data } = useFormContext()
-  const [message, setMessage] = useState('')
-  const submit: FormSubmitHandler = async (data) => {
-    setMessage(JSON.stringify(data, null, 2))
-    return { data }
+      </div>
+    );
   }
+};
 
-  return (
-    <FormProvider>
-      <Container style={{ marginTop: '1rem' }}>
-        <Header content='@codewizard-dt/use-form-hook' />
-        <Form display='edit' submit={submit} fields={[
-          { name: 'username', width: '8' },
+export const DropdownField: Story = {
+  render: () => {
+    const Test = useForm({
+      mutationFn: async () => {
+        console.log(data);
+        return { data };
+      },
+      transaction: {
+        name: 'FormTests',
+        description: 'FormTests',
+        op: 'form.submit'
+      }
+    });
+    const { data } = useFormContext();
+    const [message, setMessage] = useState('');
+    const submit: FormSubmitHandler = async (data) => {
+      setMessage(JSON.stringify(data, null, 2));
+      return { data };
+    };
+
+    return (
+      <div>
+        <Test.Form mutation={Test.mutation} fields={[
+          { name: 'username', label: 'Username', type: 'text', },
           {
-            name: 'best_restaurant', type: 'dropdown', width: '8', control: Dropdown, options: [
-              { text: 'Chipotle', value: 'CHIPOTLE' },
-              { text: 'Olive Garden', value: 'HELL' }
+            name: 'best_restaurant', label: 'Best Restaurant', type: 'select',
+            getLabel: (value) => value,
+            list: [
+              'Chipotle',
+              'Olive Garden'
             ]
           },
         ]}
@@ -69,255 +108,83 @@ export const DropdownField = () => {
         {message !== '' && <Message>
           <pre>{message}</pre>
         </Message>}
-      </Container>
-    </FormProvider>
-  )
-}
-export const RatingField = () => {
-  const Form = useForm()
-  // const { data } = useFormContext()
-  const [message, setMessage] = useState('')
-  const respond: FormResponseHandler = async (data) => {
-    setMessage(JSON.stringify(data, null, 2))
-    return { data }
+      </div>
+    );
   }
+};
 
-  return (
-    <FormProvider>
-      <Container style={{ marginTop: '1rem' }}>
-        <Header content='@codewizard-dt/use-form-hook' />
-        <Form display='edit' respond={respond} fields={[
-          { name: 'rating', control: Rating },
+export const RatingField: Story = {
+  render: () => {
+    const Test = useForm({
+      mutationFn: async () => {
+        console.log(data);
+        return { data };
+      },
+      transaction: {
+        name: 'FormTests',
+        description: 'FormTests',
+        op: 'form.submit'
+      }
+    });
+    const { data } = useFormContext();
+    const [message, setMessage] = useState('');
+    const submit: FormSubmitHandler = async (data) => {
+      setMessage(JSON.stringify(data, null, 2));
+      return { data };
+    };
+
+    return (
+      <div>
+        <Test.Form mutation={Test.mutation} fields={[
+          { name: 'rating', label: 'Rating', type: 'number', min: 1, max: 5 },
           {
-            name: 'best_restaurant', type: 'dropdown', width: '8', control: Dropdown, options: [
-              { text: 'Chipotle', value: 'CHIPOTLE' },
-              { text: 'Olive Garden', value: 'HELL' }
-            ]
-          },
+            name: 'best_restaurant', label: 'Best Restaurant', type: 'select',
+            getLabel: (value) => value,
+            list: ['Chipotle', 'Olive Garden']
+          }
         ]}
         />
         {message !== '' && <Message>
           <pre>{message}</pre>
         </Message>}
-      </Container>
-    </FormProvider>
-  )
-}
-export const Validators = () => {
-  const Form = useForm()
-  // const { data } = useFormContext()
-  const [message, setMessage] = useState('')
-  const submit: FormSubmitHandler = async (data) => {
-
-    setMessage(JSON.stringify(data, null, 2))
-    return { data }
+      </div>
+    );
   }
+};
 
-  return (
-    <FormProvider>
-      <Container style={{ marginTop: '1rem' }}>
-        <Header content='@codewizard-dt/use-form-hook' />
-        <Form display='edit' submit={submit} fields={[
-          { name: 'best_restaurant', required: true },
-          { name: 'email', required: true, validators: [validator.isEmail, 'Invalid email'] }
+export const Validators: Story = {
+  render: () => {
+    const Test = useForm({
+
+      mutationFn: async () => {
+        console.log(data);
+        return { data };
+      },
+      transaction: {
+        name: 'FormTests',
+        description: 'FormTests',
+        op: 'form.submit'
+      }
+    });
+    const { data } = useFormContext();
+    const [message, setMessage] = useState('');
+    const submit: FormSubmitHandler = async (data) => {
+      setMessage(JSON.stringify(data, null, 2));
+      return { data };
+    };
+
+    return (
+      <div>
+        <Test.Form mutation={Test.mutation} fields={[
+          { name: 'best_restaurant', label: 'Best Restaurant', type: 'text', required: true },
+          { name: 'email', label: 'Email', type: 'text', required: true }
         ]}
         />
         {message !== '' && <Message>
           <pre>{message}</pre>
         </Message>}
-      </Container>
-    </FormProvider>
-  )
-}
-// export const GroupWithName = () => {
-//   const Form = useForm()
-//   const { data } = useFormContext()
-//   const [message, setMessage] = useState('')
-//   const submit: FormSubmitHandler = async (data) => {
-//     setMessage(JSON.stringify(data, null, 2))
-//     return { data }
-//   }
-//   return (
-//     <FormProvider>
-//       <Container style={{ marginTop: '1rem' }}>
-//         <Header content='@codewizard-dt/use-form-hook' />
-//         <Header content='Nested Field Groups with Names' />
-//         <Form display='edit' submit={submit} fields={[
-//           {
-//             name: 'user', label: 'User',
-//             fields: [
-//               { name: 'name', initial: 'David' },
-//               { name: 'password', type: 'password' },
-//               { name: 'favorite_food', control: 'select', options: ['apples', 'bananas', { value: 'string cheese', label: 'StRiNg CheeSe' }] },
-//               {
-//                 name: 'settings', label: 'Settings',
-//                 fields: [
-//                   { name: 'contact_pref', control: 'select', options: ['phone', 'email', 'smoke signal'] },
-//                   { name: 'email', control: 'select', options: ['none', 'marketing', 'all'] },
-//                 ],
-//               },
-//             ],
-//           },
-//         ]} />
-//         {message !== '' && <Message>
-//           <pre>{message}</pre>
-//         </Message>}
-//       </Container>
-//     </FormProvider>
-//   )
-// }
-// export const GroupsWithoutNames = () => {
-//   const { Form } = useForm()
-//   const [message, setMessage] = useState('')
-//   const submit: FormSubmitHandler = async (data) => {
-//     setMessage(JSON.stringify(data, null, 2))
-//     return { data }
-//   }
-//   return (
-//     <FormProvider>
-//       <Container style={{ marginTop: '1rem' }}>
-//         <Header content='@codewizard-dt/use-form-hook' />
-//         <Header content='Nested Field Groups without `names`' />
-//         <Form submit={submit} fields={
-//           [
-//             {
-//               name: '',
-//               label: 'User',
-//               fields: [
-//                 { name: 'name', initial: 'Sally' },
-//                 { name: 'password', type: 'password' },
-//                 { name: 'favorite_food', control: 'select', options: ['apples', 'bananas', { value: 'string cheese', label: 'StRiNg CheeSe' }] },
-//                 {
-//                   name: '',
-//                   label: 'Settings',
-//                   fields: [
-//                     { name: 'contact_pref', control: 'select', options: ['phone', 'email', 'smoke signal'] },
-//                     { name: 'email', control: 'select', options: ['none', 'marketing', 'all'] },
-//                   ],
-//                 },
+      </div>
+    );
+  }
+};
 
-//               ],
-//             },
-//           ]
-//         } />
-//         {message !== '' && <Message>
-//           <pre>{message}</pre>
-//         </Message>}
-//       </Container>
-//     </FormProvider>
-//   )
-// }
-// export const DateTime = () => {
-//   const { Form } = useForm()
-//   const [message, setMessage] = useState('')
-//   const submit: FormSubmitHandler = async (data) => {
-//     setMessage(JSON.stringify(data, null, 2))
-//     return { data }
-//   }
-
-//   return (
-//     <FormProvider>
-//       <Container style={{ marginTop: '1rem' }}>
-//         <Header content='@codewizard-dt/use-form-hook' />
-//         <Form display='edit' submit={submit} fields={[
-//           { name: 'start', type: 'datetime' },
-//           // { name: 'finish' }
-//         ]}
-//         />
-//         {message !== '' && <Message>
-//           <pre>{message}</pre>
-//         </Message>}
-//       </Container>
-//     </FormProvider>
-//   )
-
-// }
-// export const Disabled = () => {
-//   const { Form, data } = useForm()
-//   const [message, setMessage] = useState('')
-//   const submit: FormSubmitHandler = async (data) => {
-//     setMessage(JSON.stringify(data, null, 2))
-//     return { data }
-//   }
-
-//   return (
-//     <FormProvider>
-//       <Container style={{ marginTop: '1rem' }}>
-//         <Header content='@codewizard-dt/use-form-hook' />
-//         <Form display='disabled' submit={submit} fields={[
-//           {
-//             name: "",
-//             widths: 'two',
-//             fields: [
-//               { name: 'best_restaurant' },
-//               { name: 'worst_restaurant' }
-//             ]
-//           },
-//           {
-//             name: 'Reviews', control: 'textarea', initial: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas eu ultrices diam. Suspendisse venenatis quam ac ultricies gravida. Quisque fringilla metus massa, vitae vestibulum augue faucibus eget. Nam nec libero placerat, porta nulla et, pellentesque metus. Pellentesque vulputate dui et consequat convallis. Proin facilisis sem eu sem sodales, vel iaculis risus gravida. Vivamus quis orci blandit, venenatis nisi rhoncus, porta quam. Morbi quis efficitur massa. Morbi pharetra laoreet laoreet. Quisque egestas dolor ac massa tincidunt, sed aliquet odio suscipit. Praesent enim eros, vestibulum a erat scelerisque, bibendum sollicitudin enim. Aliquam non libero vel magna bibendum eleifend. Sed bibendum ipsum ac orci sodales, sit amet luctus neque iaculis. Vivamus mauris eros, porta vitae erat eget, luctus feugiat nunc.'
-//           }
-//         ]}
-//         />
-//         {message !== '' && <Message>
-//           <pre>{message}</pre>
-//         </Message>}
-//       </Container>
-//     </FormProvider>
-//   )
-
-// }
-// export const Toggleable = () => {
-//   const { Form, data } = useForm()
-//   const [message, setMessage] = useState('')
-//   const submit: FormSubmitHandler = async (data) => {
-//     setMessage(JSON.stringify(data, null, 2))
-//     return { data }
-//   }
-
-//   return (
-//     <FormProvider>
-//       <Container style={{ marginTop: '1rem' }}>
-//         <Header content='@codewizard-dt/use-form-hook' />
-//         <Form display='toggle' submit={submit} fields={[
-//           {
-//             name: "",
-//             widths: 'two',
-//             fields: [
-//               { name: 'best_restaurant' },
-//               { name: 'worst_restaurant' }
-//             ]
-//           }
-//         ]}
-//         />
-//         {message !== '' && <Message>
-//           <pre>{message}</pre>
-//         </Message>}
-//       </Container>
-//     </FormProvider>
-//   )
-
-// }
-// export const SuccessMessage = () => {
-//   const { Form, data } = useForm()
-//   const [message, setMessage] = useState('')
-//   const submit: FormSubmitHandler = async (data) => {
-//     setMessage(JSON.stringify(data, null, 2))
-//     return { data }
-//   }
-
-//   return (
-//     <FormProvider>
-//       <Container style={{ marginTop: '1rem' }}>
-//         <Header content='@codewizard-dt/use-form-hook' />
-//         <Form successMessage='Success!' display='edit' submit={submit} fields={[
-//           { name: 'best_restaurant' },
-//           { name: 'worst_restaurant' }
-//         ]}
-//         />
-//         {message !== '' && <Message>
-//           <pre>{message}</pre>
-//         </Message>}
-//       </Container>
-//     </FormProvider>
-//   )
-// }
